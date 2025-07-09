@@ -1,6 +1,7 @@
 import ThemeToggle from "./ThemeToggle";
 import { Button } from "@/components/ui/button";
 import { Zap } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export default function Navigation() {
   return (
@@ -14,11 +15,19 @@ export default function Navigation() {
             <span className="text-xl font-bold text-gray-900 dark:text-white">DataFlow</span>
           </div>
           <div className="flex items-center space-x-4">
-            <button className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-100 transition-colors duration-200 font-medium">Features</button>
-            <button className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-100 transition-colors duration-200 font-medium">Pricing</button>
-            <button className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-100 transition-colors duration-200 font-medium">About</button>
+            <Link
+              to="/about"
+              className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-100 transition-colors duration-200 font-medium"
+            >
+              About
+            </Link>
             <ThemeToggle />
-            <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 transition-all duration-200">Get Started</Button>
+            <Button
+              asChild
+              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 transition-all duration-200"
+            >
+              <Link to="/login">Get Started</Link>
+            </Button>
           </div>
         </div>
       </div>
