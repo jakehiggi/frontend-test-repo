@@ -1,17 +1,16 @@
 "use client";
 
-import Navigation from "@/components/Navigation";
-import HeroCarousel from "@/components/HeroCarousel";
-import FeaturesSection from "@/components/FeaturesSection";
-import Footer from "@/components/Footer";
+import { Routes, Route } from "react-router-dom";
+import LandingPage from "@/routes/LandingPage";
+import About from "@/routes/About";
+import Login from "@/routes/Login";
 
 export default function App() {
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900">
-      <Navigation />
-      <HeroCarousel />
-      <FeaturesSection />
-      <Footer />
-    </div>
+    <Routes>
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/about" element={<About />} />
+      <Route path="/login" element={<Login />} />
+    </Routes>
   );
 }
