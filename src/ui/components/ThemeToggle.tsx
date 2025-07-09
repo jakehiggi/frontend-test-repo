@@ -1,9 +1,30 @@
+import { useLayoutEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { useTheme } from "next-themes";
 import { Moon, Sun } from "lucide-react";
 
+function getInitialTheme(): "light" | "dark" {
+  if (typeof window !== "undefined") {
+    const stored = localStorage.getItem("theme");
+    if (stored === "dark") return "dark";
+    if (stored === "light") return "light";
+    if (window.matchMedia("(prefers-color-scheme: dark)").matches) return "dark";
+  }
+  return "light";
+}
+
 export default function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
+  const [theme, setTheme] = useState<"light" | "dark">(getInitialTheme);
+
+  useLayoutEffect(() => {
+    if (theme === "dark") {
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+    }
+  }, [theme]);
+
   return (
     <Button
       variant="ghost"
