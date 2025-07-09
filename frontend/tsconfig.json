@@ -12,9 +12,9 @@
     "isolatedModules": true,
     "jsx": "react-jsx",
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./src/*"]
     }
   },
-  "include": ["src/**/*", "components/**/*", "hooks/**/*", "lib/**/*"],
+  "include": ["src/**/*"],
   "exclude": ["node_modules"]
 }
