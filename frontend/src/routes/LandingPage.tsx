@@ -1,4 +1,4 @@
-import Navigation from "@/components/Navigation";
+import Navigation from "@/components/Header";
 import HeroCarousel from "@/components/HeroCarousel";
 import FeaturesSection from "@/components/FeaturesSection";
 import Footer from "@/components/Footer";
