@@ -1,6 +1,5 @@
 import ThemeToggle from "./ThemeToggle";
 import { Button } from "@/components/ui/button";
-import { Zap } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export default function Navigation() {
@@ -9,11 +8,8 @@ export default function Navigation() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center space-x-2">
-            <div className="h-8 w-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-              <Zap className="h-5 w-5 text-white" />
-            </div>
             <Link to="/" className="text-xl font-bold text-gray-900 dark:text-white">
-              DataFlow
+              LEVARE AI
             </Link>
           </div>
           <div className="flex items-center space-x-4">
@@ -23,7 +19,7 @@ export default function Navigation() {
               to="/about"
               className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-100 transition-colors duration-200 font-medium"
             >
-              About
+              About us
             </Link>
             <ThemeToggle />
             <Button

@@ -9,12 +9,9 @@ import {
 } from "@/components/ui/carousel";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  ArrowRight,
-  CheckCircle,
-  Globe,
-  TrendingUp,
-} from "lucide-react";
+import { ArrowRight, CheckCircle, Globe, TrendingUp } from "lucide-react";
+
+import { HeroBackground } from "@/components/HeroBackground";
 
 export default function HeroCarousel() {
   const [api, setApi] = useState<CarouselApi>();
@@ -27,16 +24,16 @@ export default function HeroCarousel() {
     const interval = setInterval(() => {
       if (api.canScrollNext()) api.scrollNext();
       else api.scrollTo(0);
-    }, 5000);
+    }, 100000);
     return () => clearInterval(interval);
   }, [api]);
 
   const heroSlides = [
     {
-      title: "Transform Your Business with AI-Powered Analytics",
+      title: "Elevate your business with Levare AI",
       subtitle: "Unlock insights that drive growth",
       description:
-        "Harness the power of artificial intelligence to analyze your data, predict trends, and make informed decisions that accelerate your business growth.",
+        "Empowering business leaders with intelligent agents. Our platform turns ambition into everyday action.",
       icon: <TrendingUp className="h-16 w-16 text-blue-500" />,
       gradient: "from-blue-600 to-purple-600",
       features: ["Real-time Analytics", "Predictive Modeling", "Custom Dashboards"],
@@ -68,10 +65,17 @@ export default function HeroCarousel() {
         <CarouselContent>
           {heroSlides.map((slide, index) => (
             <CarouselItem key={index}>
-              <div className={`relative min-h-[600px] bg-gradient-to-br ${slide.gradient} text-white`}>
-                <div className="absolute inset-0 bg-black/20" />
+              <div className="relative min-h-[600px] bg-black text-white overflow-hidden">
+
+                <HeroBackground />
+
+                {/* Slide Gradient */}
+                <div className={`absolute inset-0 bg-gradient-to-br ${slide.gradient} opacity-30`} />
+                <div className="absolute inset-0 bg-black/10" />
+
+                {/* Slide Content */}
                 <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
-                  <div className="grid lg:grid-cols-2 gap-12 items-center">
+                  <div className="grid lg:grid-cols-[3fr_1fr] gap-6 items-center">
                     <div className="space-y-8">
                       <div className="space-y-4">
                         <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
@@ -99,14 +103,16 @@ export default function HeroCarousel() {
                         </div>
                       )}
                     </div>
-                    <div className="flex justify-center">
+                    {/* Icon}
+                    <div className="flex justify-center"> 
                       <div className="relative">
                         <div className="absolute inset-0 bg-white/20 rounded-full blur-3xl transform scale-150" />
                         <div className="relative bg-white/10 backdrop-blur-sm rounded-2xl p-12 border border-white/20 hover:bg-white/20 transition-all duration-300 transform hover:scale-105">
                           {slide.icon}
                         </div>
-                      </div>
+                      </div>     
                     </div>
+                    Icon container end */}
                   </div>
                 </div>
               </div>

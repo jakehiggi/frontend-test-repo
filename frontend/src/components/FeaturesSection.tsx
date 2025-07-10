@@ -7,29 +7,29 @@ export default function FeaturesSection() {
     <section className="py-24 bg-gray-50 dark:bg-gray-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">Why Choose DataFlow?</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">Why Choose LEVARE AI?</h2>
           <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-            We're revolutionizing how businesses understand and leverage their data with cutting-edge AI technology and enterprise-grade infrastructure.
+            I put this section in because I thought it would be a good idea to highlight the key features and benefits of our platform.
           </p>
         </div>
         <div className="grid md:grid-cols-3 gap-8 mb-16">
           {[
             {
               icon: <Zap className="h-8 w-8 text-blue-600" />,
-              title: "Lightning Fast",
-              description: "Process millions of data points in real-time with our optimized algorithms and distributed computing architecture.",
+              title: "Something here?",
+              description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut commodo ut ante eu pharetra. Nam purus felis, luctus vel cursus non, posuere non lorem.",
               benefits: ["Sub-second query responses", "Real-time data streaming", "Instant insights"],
             },
             {
               icon: <Shield className="h-8 w-8 text-green-600" />,
-              title: "Enterprise Security",
-              description: "Bank-level security with end-to-end encryption, compliance certifications, and advanced threat protection.",
-              benefits: ["SOC 2 Type II certified", "GDPR compliant", "256-bit encryption"],
+              title: "Security?",
+              description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut commodo ut ante eu pharetra. Nam purus felis, luctus vel cursus non, posuere non lorem.",
+              benefits: ["SOC 2 Type II certified", "GDPR stuff?", "encryption"],
             },
             {
               icon: <Users className="h-8 w-8 text-purple-600" />,
-              title: "Team Collaboration",
-              description: "Built for teams with advanced sharing, commenting, and workflow management features that scale with your organization.",
+              title: "Team Collaboration?",
+              description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut commodo ut ante eu pharetra. Nam purus felis, luctus vel cursus non, posuere non lorem.",
               benefits: ["Role-based access control", "Real-time collaboration", "Audit trails"],
             },
           ].map((feature, index) => (
@@ -55,6 +55,9 @@ export default function FeaturesSection() {
             </Card>
           ))}
         </div>
+
+        {/* Second Section */}
+
         <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 md:p-12 shadow-lg dark:shadow-gray-900/20">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
