@@ -110,7 +110,7 @@ export function AppSidebar() {
                   <Settings className="mr-2 h-4 w-4" />
                   Settings
                 </DropdownMenuItem>
-                <DropdownMenuItem className="text-red-600">
+                <DropdownMenuItem className="text-destructive">
                   <LogOut className="mr-2 h-4 w-4" />
                   Sign Out
                 </DropdownMenuItem>

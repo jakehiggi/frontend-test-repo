@@ -34,8 +34,8 @@ export default function HeroCarousel() {
       subtitle: "Unlock insights that drive growth",
       description:
         "Empowering business leaders with intelligent agents. Our platform turns ambition into everyday action.",
-      icon: <TrendingUp className="h-16 w-16 text-blue-500" />,
-      gradient: "from-blue-600 to-purple-600",
+      icon: <TrendingUp className="h-16 w-16 text-accent" />,
+      gradient: "from-accent to-chart-5",
       features: ["something", "something else", "Custom Dashboards"],
     },
     {
@@ -43,8 +43,8 @@ export default function HeroCarousel() {
       subtitle: "ipsum dolor sit amet",
       description:
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-      icon: <Globe className="h-16 w-16 text-green-500" />,
-      gradient: "from-green-600 to-teal-600",
+      icon: <Globe className="h-16 w-16 text-accent" />,
+      gradient: "from-accent to-chart-5",
       features: ["Global CDN", "Auto-scaling", "24/7 Monitoring"],
     },
     {
@@ -52,8 +52,8 @@ export default function HeroCarousel() {
       subtitle: "join now.., ",
       description:
         "register interest etc. etc. Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-      icon: <CheckCircle className="h-16 w-16 text-orange-500" />,
-      gradient: "from-orange-600 to-red-600",
+      icon: <CheckCircle className="h-16 w-16 text-accent" />,
+      gradient: "from-accent to-chart-5",
       features: ["join up", "it's cool", "blah"],
       cta: true,
     },
@@ -65,35 +65,35 @@ export default function HeroCarousel() {
         <CarouselContent>
           {heroSlides.map((slide, index) => (
             <CarouselItem key={index}>
-              <div className="relative min-h-[600px] bg-black text-white overflow-hidden">
+              <div className="relative min-h-[600px] bg-primary text-primary-foreground overflow-hidden">
 
                 <HeroBackground />
 
                 {/* Slide Gradient */}
                 <div className={`absolute inset-0 bg-gradient-to-br ${slide.gradient} opacity-30`} />
-                <div className="absolute inset-0 bg-black/10" />
+                <div className="absolute inset-0 bg-primary/10" />
 
                 {/* Slide Content */}
                 <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
                   <div className="grid lg:grid-cols-[3fr_1fr] gap-6 items-center">
                     <div className="space-y-8">
                       <div className="space-y-4">
-                        <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
+                        <Badge variant="secondary" className="bg-primary-foreground/20 text-primary-foreground border-primary-foreground/30">
                           {slide.subtitle}
                         </Badge>
                         <h1 className="text-4xl md:text-6xl font-bold leading-tight">{slide.title}</h1>
-                        <p className="text-xl text-white/90 leading-relaxed">{slide.description}</p>
+                        <p className="text-xl text-primary-foreground/90 leading-relaxed">{slide.description}</p>
                       </div>
                       <div className="flex flex-wrap gap-3">
                         {slide.features.map((feature, idx) => (
-                          <Badge key={idx} variant="outline" className="bg-white/10 text-white border-white/30">
+                          <Badge key={idx} variant="outline" className="bg-primary-foreground/10 text-primary-foreground border-primary-foreground/30">
                             {feature}
                           </Badge>
                         ))}
                       </div>
                       {slide.cta && (
                         <div className="flex flex-col sm:flex-row gap-4">
-                          <Button size="lg" className="bg-white text-gray-900 hover:bg-gray-100 transform hover:scale-105 transition-all duration-200">
+                          <Button size="lg" className="bg-primary-foreground text-primary hover:bg-primary-foreground/90 transform hover:scale-105 transition-all duration-200">
                             Start Free Trial
                             <ArrowRight className="ml-2 h-5 w-5" />
                           </Button>
@@ -103,8 +103,8 @@ export default function HeroCarousel() {
                     {/* Icon}
                     <div className="flex justify-center"> 
                       <div className="relative">
-                        <div className="absolute inset-0 bg-white/20 rounded-full blur-3xl transform scale-150" />
-                        <div className="relative bg-white/10 backdrop-blur-sm rounded-2xl p-12 border border-white/20 hover:bg-white/20 transition-all duration-300 transform hover:scale-105">
+                        <div className="absolute inset-0 bg-primary-foreground/20 rounded-full blur-3xl transform scale-150" />
+                        <div className="relative bg-primary-foreground/10 backdrop-blur-sm rounded-2xl p-12 border border-primary-foreground/20 hover:bg-primary-foreground/20 transition-all duration-300 transform hover:scale-105">
                           {slide.icon}
                         </div>
                       </div>     
@@ -116,14 +116,14 @@ export default function HeroCarousel() {
             </CarouselItem>
           ))}
         </CarouselContent>
-        <CarouselPrevious className="left-4 bg-white/20 border-white/30 text-white hover:bg-white/30" />
-        <CarouselNext className="right-4 bg-white/20 border-white/30 text-white hover:bg-white/30" />
+        <CarouselPrevious className="left-4 bg-primary-foreground/20 border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/30" />
+        <CarouselNext className="right-4 bg-primary-foreground/20 border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/30" />
       </Carousel>
       <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex space-x-2">
         {heroSlides.map((_, index) => (
           <button
             key={index}
-            className={`w-3 h-3 rounded-full transition-all duration-200 ${current === index ? "bg-white" : "bg-white/50"}`}
+            className={`w-3 h-3 rounded-full transition-all duration-200 ${current === index ? "bg-primary-foreground" : "bg-primary-foreground/50"}`}
             onClick={() => api?.scrollTo(index)}
           />
         ))}

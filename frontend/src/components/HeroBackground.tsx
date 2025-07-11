@@ -9,9 +9,9 @@ export function HeroBackground() {
   return (
     <div className="absolute inset-0 overflow-hidden">
       {/* Blobs */}
-      <div className="absolute w-[70vw] h-[70vw] bg-purple-700 opacity-40 blur-2xl rounded-full animate-blob1" />
-      <div className="absolute w-[50vw] h-[50vw] bg-pink-500 opacity-40 blur-2xl rounded-full animate-blob2 top-1/2 left-1/3" />
-      <div className="absolute w-[90vw] h-[90vw] bg-indigo-600 opacity-40 blur-2xl rounded-full animate-blob3 top-1/4 left-1/2" />
+      <div className="absolute w-[70vw] h-[70vw] bg-accent opacity-40 blur-2xl rounded-full animate-blob1" />
+      <div className="absolute w-[50vw] h-[50vw] bg-accent opacity-40 blur-2xl rounded-full animate-blob2 top-1/2 left-1/3" />
+      <div className="absolute w-[90vw] h-[90vw] bg-accent opacity-40 blur-2xl rounded-full animate-blob3 top-1/4 left-1/2" />
 
       {/* Mouse Light 
       <div className="absolute inset-0 pointer-events-none mix-blend-screen">
