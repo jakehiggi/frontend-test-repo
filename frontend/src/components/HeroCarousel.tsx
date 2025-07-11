@@ -36,25 +36,25 @@ export default function HeroCarousel() {
         "Empowering business leaders with intelligent agents. Our platform turns ambition into everyday action.",
       icon: <TrendingUp className="h-16 w-16 text-blue-500" />,
       gradient: "from-blue-600 to-purple-600",
-      features: ["Real-time Analytics", "Predictive Modeling", "Custom Dashboards"],
+      features: ["something", "something else", "Custom Dashboards"],
     },
     {
-      title: "Scale Globally with Confidence",
-      subtitle: "Enterprise-grade infrastructure",
+      title: "Lorem ipsum dolor sit amet",
+      subtitle: "ipsum dolor sit amet",
       description:
-        "Built for scale with 99.9% uptime guarantee. Our robust infrastructure supports businesses from startups to Fortune 500 companies worldwide.",
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
       icon: <Globe className="h-16 w-16 text-green-500" />,
       gradient: "from-green-600 to-teal-600",
       features: ["Global CDN", "Auto-scaling", "24/7 Monitoring"],
     },
     {
       title: "Ready to Get Started?",
-      subtitle: "Join thousands of satisfied customers",
+      subtitle: "join now.., ",
       description:
-        "Start your free trial today and experience the difference our platform can make for your business. No credit card required.",
+        "register interest etc. etc. Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
       icon: <CheckCircle className="h-16 w-16 text-orange-500" />,
       gradient: "from-orange-600 to-red-600",
-      features: ["14-day Free Trial", "No Setup Fees", "Cancel Anytime"],
+      features: ["join up", "it's cool", "blah"],
       cta: true,
     },
   ];
@@ -96,9 +96,6 @@ export default function HeroCarousel() {
                           <Button size="lg" className="bg-white text-gray-900 hover:bg-gray-100 transform hover:scale-105 transition-all duration-200">
                             Start Free Trial
                             <ArrowRight className="ml-2 h-5 w-5" />
-                          </Button>
-                          <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-gray-900 transition-all duration-200 bg-transparent">
-                            Watch Demo
                           </Button>
                         </div>
                       )}

@@ -13,7 +13,7 @@ export function HeroBackground() {
       <div className="absolute w-[50vw] h-[50vw] bg-pink-500 opacity-40 blur-2xl rounded-full animate-blob2 top-1/2 left-1/3" />
       <div className="absolute w-[90vw] h-[90vw] bg-indigo-600 opacity-40 blur-2xl rounded-full animate-blob3 top-1/4 left-1/2" />
 
-      {/* Mouse Light */}
+      {/* Mouse Light 
       <div className="absolute inset-0 pointer-events-none mix-blend-screen">
         <div
           className="absolute inset-0 transition-all duration-100"
@@ -27,7 +27,7 @@ export function HeroBackground() {
             background: `radial-gradient(circle at ${lightPos.x}px ${lightPos.y}px, rgba(255, 255, 255, 0.08), transparent 450px)`
           }}
         />
-      </div>
+      </div> */}
     </div>
   );
 }

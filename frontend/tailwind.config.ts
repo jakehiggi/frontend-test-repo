@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+import { fontFamily } from "tailwindcss/defaultTheme";
 
 // all in fixtures is set to tailwind v3 as interims solutions
 
@@ -10,7 +11,15 @@ const config: Config = {
     ],
   theme: {
   	extend: {
+		fontFamily: {
+  			sans: ['"Open Sans"', ...fontFamily.sans],
+		},
   		colors: {
+			levare: {
+				DEFAULT: 'hsl(var(--levare-blue))',
+				foreground: 'hsl(var(--levare-blue-foreground))',
+			},	
+
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
   			card: {
@@ -91,6 +100,5 @@ const config: Config = {
   		}
   	}
   },
-  plugins: [require("tailwindcss-animate")],
 };
 export default config;
