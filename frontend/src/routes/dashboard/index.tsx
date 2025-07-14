@@ -1,5 +1,5 @@
-import { DashboardLayout } from "@/components/dashboard/dashboard-layout"
+import { ChatDashboard } from "@/components/dashboard/chat-dashboard"
 
 export default function Dashboard() {
-  return <DashboardLayout />
+  return <ChatDashboard onSignOut={() => {}} />
 }
