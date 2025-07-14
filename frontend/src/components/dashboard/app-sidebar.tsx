@@ -51,7 +51,7 @@ export function AppSidebar() {
               </div>
               <div className="flex flex-col gap-0.5 leading-none">
                 <span className="font-semibold">Dashboard</span>
-                <span className="text-xs">v1.0.0</span>
+                <span className="text-xs"></span>
               </div>
             </SidebarMenuButton>
           </SidebarMenuItem>

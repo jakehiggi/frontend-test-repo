@@ -38,7 +38,7 @@ export default function FeaturesSection() {
               className="group hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border-0 shadow-lg bg-card dark:shadow-gray-900/20"
             >
               <CardContent className="p-8">
-                <div className="mb-6 p-3 bg-muted rounded-lg w-fit group-hover:scale-110 transition-transform duration-200">
+                <div className="mb-6 p-3 bg-muted rounded-lg w-fit group-hover:scale-110 transition-transform duration-200 border border-transparent hover:border-accent hover:shadow-md hover:shadow-accent/40">
                   {feature.icon}
                 </div>
                 <h3 className="text-xl font-semibold text-foreground mb-4">{feature.title}</h3>
