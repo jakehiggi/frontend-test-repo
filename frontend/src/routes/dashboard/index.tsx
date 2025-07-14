@@ -1,4 +1,4 @@
-import { ChatDashboard } from "@/components/dashboard/chat-dashboard"
+import { ChatDashboard } from "@/components/dashboard/ChatDashboard"
 
 export default function Dashboard() {
   return <ChatDashboard onSignOut={() => {}} />
