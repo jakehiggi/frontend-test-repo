@@ -1,5 +1,5 @@
-import { ChatDashboard } from "@/components/dashboard/ChatDashboard"
+import { Outlet } from "react-router-dom";
 
 export default function Dashboard() {
-  return <ChatDashboard onSignOut={() => {}} />
+  return <Outlet />;
 }

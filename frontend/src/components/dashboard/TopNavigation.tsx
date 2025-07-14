@@ -14,6 +14,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { useModelSelection } from "@/hooks/useModelSelection"
 import ThemeToggle from "@/components/ThemeToggle"
+import { Link, useNavigate } from "react-router-dom"
 
 interface TopNavigationProps {
   onSignOut: () => void
@@ -22,6 +23,7 @@ interface TopNavigationProps {
 
 export function TopNavigation({ onSignOut, isSigningOut = false }: TopNavigationProps) {
   const { selectedModel, availableModels, selectModel } = useModelSelection()
+  const navigate = useNavigate()
 
   const handleSignOut = () => {
     // You could add a confirmation dialog here if needed
@@ -94,7 +96,10 @@ export function TopNavigation({ onSignOut, isSigningOut = false }: TopNavigation
                 <User className="mr-2 h-4 w-4" />
                 Profile
               </DropdownMenuItem>
-              <DropdownMenuItem disabled={isSigningOut}>
+              <DropdownMenuItem
+                disabled={isSigningOut}
+                onSelect={() => navigate("/dashboard/settings")}
+              >
                 <Settings className="mr-2 h-4 w-4" />
                 Settings
               </DropdownMenuItem>

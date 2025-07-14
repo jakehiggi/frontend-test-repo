@@ -1,4 +1,4 @@
-import ThemeToggle from "./ThemeToggle";
+import ThemeToggle from "../ThemeToggle";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 

@@ -1,6 +1,7 @@
 "use client"
 
 import React from "react"
+import { Link } from "react-router-dom"
 
 import { useState } from "react"
 import {
@@ -342,10 +343,11 @@ export function ChatSidebar({ isOpen, onToggle, activeConversationId, onConversa
               </AccordionItem>
 
               <AccordionItem value="settings">
-                <AccordionTrigger className="px-2 py-3 hover:no-underline">Preferences</AccordionTrigger>
-                <AccordionContent className="px-2 pb-4">
-                  <div className="text-sm text-muted-foreground">Preferences section - coming soon</div>
-                </AccordionContent>
+                <AccordionTrigger className="px-2 py-3 hover:no-underline">
+                  <Link to="/dashboard/preferences" className="flex-1 text-left">
+                    Preferences
+                  </Link>
+                </AccordionTrigger>
               </AccordionItem>
             </Accordion>
           </div>
