@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { useModelSelection } from "@/hooks/useModelSelection"
+import ThemeToggle from "@/components/ThemeToggle"
 
 interface TopNavigationProps {
   onSignOut: () => void
@@ -66,6 +67,8 @@ export function TopNavigation({ onSignOut, isSigningOut = false }: TopNavigation
           </DropdownMenu>
 
           <div className="flex-1" />
+
+          <ThemeToggle />
 
           {/* User Dropdown */}
           <DropdownMenu>
