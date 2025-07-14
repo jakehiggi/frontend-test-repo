@@ -2,7 +2,7 @@
 
 import { ChatDashboard } from "@/components/chat-dashboard"
 import { LandingPage } from "@/components/landing-page"
-import { useAuth } from "@/hooks/use-auth"
+import { useAuth } from "@/hooks/useAuth"
 
 export default function Home() {
   const { isAuthenticated, isLoading, signIn, signOut } = useAuth()

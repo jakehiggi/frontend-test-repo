@@ -15,8 +15,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { FileBreadcrumbs } from "./file-system/file-breadcrumbs"
 import { FileListView } from "./file-system/file-list-view"
-import { useFileSystem } from "@/hooks/use-file-system"
-import { useRecentFiles } from "@/hooks/use-recent-files"
+import { useFileSystem } from "@/hooks/useFileSystem"
+import { useRecentFiles } from "@/hooks/useRecentFiles"
 import type { FileItem, FileSizeLimits } from "@/types/file-system"
 
 interface FileAttachmentDialogProps {

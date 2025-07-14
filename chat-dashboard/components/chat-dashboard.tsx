@@ -4,9 +4,9 @@ import { useState } from "react"
 import { cn } from "@/lib/utils"
 import { ChatSidebar } from "./chat-sidebar"
 import { TopNavigation } from "./top-navigation"
-import { Footer } from "./footer"
+import { Footer } from "./Footer"
 import type { Conversation, Message } from "@/types/chat"
-import { useConversations } from "@/hooks/use-conversations"
+import { useConversations } from "@/hooks/useConversations"
 import { TabbedMainSection } from "./tabbed-main-section"
 
 interface ChatDashboardProps {

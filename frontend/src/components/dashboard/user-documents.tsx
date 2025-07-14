@@ -1,6 +1,6 @@
 "use client"
 
-import { useFileSystem } from "@/hooks/use-file-system"
+import { useFileSystem } from "@/hooks/useFileSystem"
 import { FileBreadcrumbs } from "./file-system/file-breadcrumbs"
 import { FileListView } from "./file-system/file-list-view"
 

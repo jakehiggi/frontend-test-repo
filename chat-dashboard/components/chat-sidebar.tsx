@@ -41,7 +41,7 @@ import { Input } from "@/components/ui/input"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { cn } from "@/lib/utils"
 import type { ChatSidebarProps, Conversation, SortOrder, SortType } from "@/types/chat"
-import { useConversations } from "@/hooks/use-conversations"
+import { useConversations } from "@/hooks/useConversations"
 
 export function ChatSidebar({ isOpen, onToggle, activeConversationId, onConversationSelect }: ChatSidebarProps) {
   const [searchQuery, setSearchQuery] = useState("")
