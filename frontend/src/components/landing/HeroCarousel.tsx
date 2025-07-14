@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, CheckCircle, Globe, TrendingUp } from "lucide-react";
 
-import { HeroBackground } from "@/components/HeroBackground";
+import { HeroBackground } from "@/components/landing/HeroBackground";
 
 export default function HeroCarousel() {
   const [api, setApi] = useState<CarouselApi>();
