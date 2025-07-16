@@ -1,6 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle, Globe, Shield, TrendingUp, Users, Zap } from "lucide-react";
+import { CheckCircle, BrainCircuit, Shield, CircleFadingArrowUp, Users, Zap } from "lucide-react";
 
 export default function FeaturesSection() {
   return (
@@ -15,21 +15,21 @@ export default function FeaturesSection() {
         <div className="grid md:grid-cols-3 gap-8 mb-16">
           {[
             {
-              icon: <Zap className="h-8 w-8 text-accent" />,
-              title: "Something here?",
-              description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut commodo ut ante eu pharetra. Nam purus felis, luctus vel cursus non, posuere non lorem.",
+              icon: <BrainCircuit className="h-8 w-8 text-accent" />,
+              title: "Tailored Intelligence",
+              description: "Our intelligent agents are custom-designed to fit the specific needs of your business, ensuring effective support. This bespoke approach allows for the optimisation of organisational strategies and performance",
               benefits: ["Sub-second query responses", "Real-time data streaming", "Instant insights"],
             },
             {
-              icon: <Shield className="h-8 w-8 text-accent" />,
-              title: "Security?",
-              description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut commodo ut ante eu pharetra. Nam purus felis, luctus vel cursus non, posuere non lorem.",
+              icon: <CircleFadingArrowUp className="h-8 w-8 text-accent" />,
+              title: "Continuous Improvement",
+              description: "Levare AI promotes ongoing enhancements through real-time insights and analytics, fostering a culture of performance improvement. Our agents consistently identify opportunities for optimising operational processes.",
               benefits: ["SOC 2 Type II certified", "GDPR stuff?", "encryption"],
             },
             {
               icon: <Users className="h-8 w-8 text-accent" />,
-              title: "Team Collaboration?",
-              description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut commodo ut ante eu pharetra. Nam purus felis, luctus vel cursus non, posuere non lorem.",
+              title: "Collaborative Alignment",
+              description: "We facilitate seamless collaboration between executive teams and departments, ensuring everyone is aligned towards common goals. This alignment enables outstanding customer experiences and drives organisational success.",
               benefits: ["Role-based access control", "Real-time collaboration", "Audit trails"],
             },
           ].map((feature, index) => (

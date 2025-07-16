@@ -27,7 +27,7 @@ interface FileAttachmentDialogProps {
 }
 
 const ATTACHMENT_SIZE_LIMITS: FileSizeLimits = {
-  maxFileSize: 25 * 1024 * 1024, // 25MB per file
+  maxFileSize: 20 * 1024 * 1024, // 20MB per file
   maxTotalSize: 100 * 1024 * 1024, // 100MB total
   maxFileCount: 5, // 5 files max
 }

@@ -1,3 +1,4 @@
+// frontend/src/components/dashboard/ChatDashboard.tsx (Updated)
 "use client"
 
 import { useState } from "react"
@@ -5,22 +6,18 @@ import { cn } from "@/lib/utils"
 import { ChatSidebar } from "./ChatSidebar"
 import { TopNavigation } from "./TopNavigation"
 import { Footer } from "./Footer"
+import { LoadingOverlay } from "./LoadingOverlay"
 import type { Conversation, Message } from "@/types/chat"
 import { useConversations } from "@/hooks/useConversations"
+import { useAuth } from "@/contexts/AuthContext"
 import { TabbedMainSection } from "./TabbedMainSection"
-// Main chat dashboard component
 
-
-interface ChatDashboardProps {
-  onSignOut: () => void
-  isSigningOut?: boolean
-}
-
-export function ChatDashboard({ onSignOut, isSigningOut = false }: ChatDashboardProps) {
+export function ChatDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [activeConversation, setActiveConversation] = useState<Conversation | null>(null)
   const [conversationMessages, setConversationMessages] = useState<Message[]>([])
 
+  const { logout, isLoading: authLoading } = useAuth()
   const { loadConversation } = useConversations()
 
   const toggleSidebar = () => {
@@ -44,6 +41,19 @@ export function ChatDashboard({ onSignOut, isSigningOut = false }: ChatDashboard
     }
   }
 
+  const handleSignOut = async () => {
+    try {
+      await logout()
+      // Navigation will be handled by the App component based on auth state
+    } catch (error) {
+      console.error("Sign out error:", error)
+    }
+  }
+
+  if (authLoading) {
+    return <LoadingOverlay message="Loading your dashboard..." />
+  }
+
   return (
     <div className="flex h-screen w-full relative pb-12">
       <ChatSidebar
@@ -59,7 +69,7 @@ export function ChatDashboard({ onSignOut, isSigningOut = false }: ChatDashboard
           sidebarOpen ? "md:ml-80" : "ml-0",
         )}
       >
-        <TopNavigation onSignOut={onSignOut} isSigningOut={isSigningOut} />
+        <TopNavigation onSignOut={handleSignOut} isSigningOut={authLoading} />
         <main className="flex-1 min-h-0">
           <TabbedMainSection activeConversation={activeConversation} initialMessages={conversationMessages} />
         </main>
