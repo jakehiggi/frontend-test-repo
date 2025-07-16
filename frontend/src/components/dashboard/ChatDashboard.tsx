@@ -1,20 +1,20 @@
+// frontend/src/components/dashboard/ChatDashboard.tsx
 "use client"
 
+import { useEffect } from "react"
 import { cn } from "@/lib/utils"
 import { ChatSidebar } from "./ChatSidebar"
 import { TopNavigation } from "./TopNavigation"
 import { Footer } from "./Footer"
 import { TabbedMainSection } from "./TabbedMainSection"
+import { LoadingOverlay } from "./LoadingOverlay"
 import { useChat } from "@/hooks/useChat"
+import { useAuth } from "@/contexts/AuthContext"
 import type { Conversation } from "@/types/chat"
 
-interface ChatDashboardProps {
-  onSignOut: () => void
-  isSigningOut?: boolean
-}
-
-export function ChatDashboard({ onSignOut, isSigningOut = false }: ChatDashboardProps) {
-  const { activeConversation, messages, sidebarOpen, toggleSidebar, selectConversation } = useChat()
+export function ChatDashboard() {
+  const { logout, isLoading: authLoading } = useAuth()
+  const { activeConversation, messages, sidebarOpen, toggleSidebar, selectConversation, isLoading } = useChat()
 
   const handleConversationSelect = async (conversation: Conversation) => {
     try {
@@ -22,6 +22,19 @@ export function ChatDashboard({ onSignOut, isSigningOut = false }: ChatDashboard
     } catch (error) {
       console.error("Failed to load conversation:", error)
     }
+  }
+
+  const handleSignOut = async () => {
+    try {
+      await logout()
+    } catch (error) {
+      console.error("Sign out error:", error)
+    }
+  }
+
+  // Show loading overlay during auth operations
+  if (authLoading) {
+    return <LoadingOverlay message="Loading dashboard..." />
   }
 
   return (
@@ -39,7 +52,7 @@ export function ChatDashboard({ onSignOut, isSigningOut = false }: ChatDashboard
           sidebarOpen ? "md:ml-80" : "ml-0",
         )}
       >
-        <TopNavigation onSignOut={onSignOut} isSigningOut={isSigningOut} />
+        <TopNavigation onSignOut={handleSignOut} isSigningOut={authLoading} />
         <main className="flex-1 min-h-0">
           <TabbedMainSection 
             activeConversation={activeConversation} 
@@ -49,6 +62,9 @@ export function ChatDashboard({ onSignOut, isSigningOut = false }: ChatDashboard
       </div>
 
       <Footer />
+      
+      {/* Show loading overlay for chat operations */}
+      {isLoading && <LoadingOverlay message="Loading conversation..." />}
     </div>
   )
 }

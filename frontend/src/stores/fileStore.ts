@@ -1,3 +1,4 @@
+// frontend/src/stores/fileStore.ts
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
 import type { FileItem, BreadcrumbItem } from '@/types/file-system'
@@ -11,7 +12,7 @@ interface FileStore {
   selectedFiles: FileItem[]
   uploadError: string | null
 
-  // Actions
+  // Actions - stable references only
   setUserFiles: (files: FileItem[]) => void
   setGeneratedFiles: (files: FileItem[]) => void
   addFile: (file: FileItem, isGenerated?: boolean) => void
@@ -24,11 +25,70 @@ interface FileStore {
   setSelectedFiles: (files: FileItem[]) => void
   toggleFileSelection: (file: FileItem) => void
   setUploadError: (error: string | null) => void
+}
 
-  // Computed getters
-  getCurrentFiles: () => FileItem[]
-  getFileById: (fileId: string) => FileItem | undefined
-  getBreadcrumbs: () => BreadcrumbItem[]
+// Helper functions outside the store to avoid recreation
+const getAllFiles = (userFiles: FileItem[], generatedFiles: FileItem[]) => {
+  return [...userFiles, ...generatedFiles]
+}
+
+const getCurrentFiles = (userFiles: FileItem[], generatedFiles: FileItem[], currentPath: string) => {
+  const allFiles = getAllFiles(userFiles, generatedFiles)
+  
+  if (currentPath === "/") {
+    return allFiles.filter(file => !file.parentId)
+  }
+  
+  const pathParts = currentPath.split("/").filter(Boolean)
+  let currentId: string | null = null
+  
+  for (const part of pathParts) {
+    const folder = allFiles.find(f => f.type === "folder" && f.name === part && f.parentId === currentId)
+    if (folder) {
+      currentId = folder.id
+    }
+  }
+  
+  return allFiles.filter(file => file.parentId === currentId)
+}
+
+const getFileById = (userFiles: FileItem[], generatedFiles: FileItem[], fileId: string) => {
+  const allFiles = getAllFiles(userFiles, generatedFiles)
+  return allFiles.find(file => file.id === fileId)
+}
+
+const getBreadcrumbs = (userFiles: FileItem[], generatedFiles: FileItem[], currentPath: string): BreadcrumbItem[] => {
+  if (currentPath === "/") {
+    return [{ id: "root", name: "Root", path: "/" }]
+  }
+
+  const parts = currentPath.split("/").filter(Boolean)
+  const breadcrumbs = [{ id: "root", name: "Root", path: "/" }]
+  const allFiles = getAllFiles(userFiles, generatedFiles)
+
+  let currentId: string | null = null
+  let currentPathBuilder = ""
+
+  for (const part of parts) {
+    currentPathBuilder += `/${part}`
+    const folder = allFiles.find(f => f.type === "folder" && f.name === part && f.parentId === currentId)
+    if (folder) {
+      breadcrumbs.push({
+        id: folder.id,
+        name: folder.name,
+        path: currentPathBuilder,
+      })
+      currentId = folder.id
+    }
+  }
+
+  return breadcrumbs
+}
+
+const deleteRecursive = (files: FileItem[], idToDelete: string): FileItem[] => {
+  const children = files.filter(f => f.parentId === idToDelete)
+  children.forEach(child => deleteRecursive(files, child.id))
+  return files.filter(f => f.id !== idToDelete && f.parentId !== idToDelete)
 }
 
 export const useFileStore = create<FileStore>()(
@@ -68,11 +128,11 @@ export const useFileStore = create<FileStore>()(
       uploadError: null,
 
       // Actions
-      setUserFiles: (files: FileItem[]) => set({ userFiles: files }),
+      setUserFiles: (files) => set({ userFiles: files }),
       
-      setGeneratedFiles: (files: FileItem[]) => set({ generatedFiles: files }),
+      setGeneratedFiles: (files) => set({ generatedFiles: files }),
       
-      addFile: (file: FileItem, isGenerated = false) => set((state) => {
+      addFile: (file, isGenerated = false) => set((state) => {
         const fileArray = isGenerated ? 'generatedFiles' : 'userFiles'
         const newRecentFiles = [file, ...state.recentFiles.filter(f => f.id !== file.id)].slice(0, 10)
         
@@ -82,7 +142,7 @@ export const useFileStore = create<FileStore>()(
         }
       }),
       
-      updateFile: (fileId: string, updates: Partial<FileItem>, isGenerated = false) => set((state) => {
+      updateFile: (fileId, updates, isGenerated = false) => set((state) => {
         const fileArray = isGenerated ? 'generatedFiles' : 'userFiles'
         return {
           [fileArray]: state[fileArray].map(file => 
@@ -91,14 +151,8 @@ export const useFileStore = create<FileStore>()(
         }
       }),
       
-      deleteFile: (fileId: string, isGenerated = false) => set((state) => {
+      deleteFile: (fileId, isGenerated = false) => set((state) => {
         const fileArray = isGenerated ? 'generatedFiles' : 'userFiles'
-        
-        const deleteRecursive = (files: FileItem[], idToDelete: string): FileItem[] => {
-          const children = files.filter(f => f.parentId === idToDelete)
-          children.forEach(child => deleteRecursive(files, child.id))
-          return files.filter(f => f.id !== idToDelete && f.parentId !== idToDelete)
-        }
         
         return {
           [fileArray]: deleteRecursive(state[fileArray], fileId),
@@ -107,7 +161,7 @@ export const useFileStore = create<FileStore>()(
         }
       }),
       
-      renameFile: (fileId: string, newName: string, isGenerated = false) => set((state) => {
+      renameFile: (fileId, newName, isGenerated = false) => set((state) => {
         const fileArray = isGenerated ? 'generatedFiles' : 'userFiles'
         return {
           [fileArray]: state[fileArray].map(file => {
@@ -126,17 +180,17 @@ export const useFileStore = create<FileStore>()(
         }
       }),
       
-      setCurrentPath: (path: string) => set({ currentPath: path }),
+      setCurrentPath: (path) => set({ currentPath: path }),
       
-      addToRecentFiles: (file: FileItem) => set((state) => ({
+      addToRecentFiles: (file) => set((state) => ({
         recentFiles: [file, ...state.recentFiles.filter(f => f.id !== file.id)].slice(0, 10)
       })),
       
       clearRecentFiles: () => set({ recentFiles: [] }),
       
-      setSelectedFiles: (files: FileItem[]) => set({ selectedFiles: files }),
+      setSelectedFiles: (files) => set({ selectedFiles: files }),
       
-      toggleFileSelection: (file: FileItem) => set((state) => {
+      toggleFileSelection: (file) => set((state) => {
         const isSelected = state.selectedFiles.some(f => f.id === file.id)
         return {
           selectedFiles: isSelected 
@@ -145,64 +199,20 @@ export const useFileStore = create<FileStore>()(
         }
       }),
       
-      setUploadError: (error: string | null) => set({ uploadError: error }),
-
-      // Computed getters
-      getCurrentFiles: () => {
-        const state = get()
-        const allFiles = [...state.userFiles, ...state.generatedFiles]
-        
-        if (state.currentPath === "/") {
-          return allFiles.filter(file => !file.parentId)
-        }
-        
-        const pathParts = state.currentPath.split("/").filter(Boolean)
-        let currentId: string | null = null
-        
-        for (const part of pathParts) {
-          const folder = allFiles.find(f => f.type === "folder" && f.name === part && f.parentId === currentId)
-          if (folder) {
-            currentId = folder.id
-          }
-        }
-        
-        return allFiles.filter(file => file.parentId === currentId)
-      },
-
-      getFileById: (fileId: string) => {
-        const state = get()
-        return [...state.userFiles, ...state.generatedFiles].find(file => file.id === fileId)
-      },
-
-      getBreadcrumbs: () => {
-        const state = get()
-        if (state.currentPath === "/") {
-          return [{ id: "root", name: "Root", path: "/" }]
-        }
-
-        const parts = state.currentPath.split("/").filter(Boolean)
-        const breadcrumbs = [{ id: "root", name: "Root", path: "/" }]
-        const allFiles = [...state.userFiles, ...state.generatedFiles]
-
-        let currentId: string | null = null
-        let currentPathBuilder = ""
-
-        for (const part of parts) {
-          currentPathBuilder += `/${part}`
-          const folder = allFiles.find(f => f.type === "folder" && f.name === part && f.parentId === currentId)
-          if (folder) {
-            breadcrumbs.push({
-              id: folder.id,
-              name: folder.name,
-              path: currentPathBuilder,
-            })
-            currentId = folder.id
-          }
-        }
-
-        return breadcrumbs
-      },
+      setUploadError: (error) => set({ uploadError: error }),
     }),
     { name: 'file-store' }
   )
 )
+
+// Export helper functions that components can use
+export const fileStoreSelectors = {
+  getCurrentFiles: (userFiles: FileItem[], generatedFiles: FileItem[], currentPath: string) => 
+    getCurrentFiles(userFiles, generatedFiles, currentPath),
+  
+  getFileById: (userFiles: FileItem[], generatedFiles: FileItem[], fileId: string) => 
+    getFileById(userFiles, generatedFiles, fileId),
+  
+  getBreadcrumbs: (userFiles: FileItem[], generatedFiles: FileItem[], currentPath: string) => 
+    getBreadcrumbs(userFiles, generatedFiles, currentPath),
+}

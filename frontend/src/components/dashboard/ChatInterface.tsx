@@ -1,10 +1,12 @@
+// frontend/src/components/dashboard/ChatInterface.tsx
 "use client"
 
 import type React from "react"
 import { useState, useEffect } from "react"
-import { Send, Paperclip, X } from "lucide-react"
+import { Send, Paperclip, X, AlertCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { FileAttachmentDialog } from "./FileAttachmentDialog"
 import type { Message, Conversation } from "@/types/chat"
@@ -21,13 +23,17 @@ export function ChatInterface({ activeConversation, initialMessages = [] }: Chat
   const [attachmentDialogOpen, setAttachmentDialogOpen] = useState(false)
   const [attachedFiles, setAttachedFiles] = useState<FileItem[]>([])
 
-  const { messages, sendMessage } = useChat()
+  const { messages, sendMessage, error, clearError } = useChat()
 
   // Clear input when switching conversations
   useEffect(() => {
     setMessage("")
     setAttachedFiles([])
-  }, [activeConversation?.id])
+    // Clear any existing errors when switching conversations
+    if (error) {
+      clearError()
+    }
+  }, [activeConversation?.id, error, clearError])
 
   const handleSendMessage = () => {
     if (!message.trim() && attachedFiles.length === 0) return
@@ -58,6 +64,10 @@ export function ChatInterface({ activeConversation, initialMessages = [] }: Chat
     setAttachedFiles((prev) => prev.filter((f) => f.id !== fileId))
   }
 
+  const dismissError = () => {
+    clearError()
+  }
+
   return (
     <TooltipProvider>
       <div className="flex flex-col h-full">
@@ -66,8 +76,28 @@ export function ChatInterface({ activeConversation, initialMessages = [] }: Chat
           <div className="border-b p-4 bg-background/95 backdrop-blur">
             <h2 className="font-semibold text-lg">{activeConversation.title}</h2>
             <p className="text-sm text-muted-foreground">
-              Created {activeConversation.createdAt.toLocaleDateString()}
+              Created {new Date(activeConversation.createdAt).toLocaleDateString()}
             </p>
+          </div>
+        )}
+
+        {/* Error Alert */}
+        {error && (
+          <div className="p-4 border-b">
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription className="flex justify-between items-center">
+                <span>{error}</span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={dismissError}
+                  className="h-auto p-1 hover:bg-transparent"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </AlertDescription>
+            </Alert>
           </div>
         )}
 
@@ -100,7 +130,7 @@ export function ChatInterface({ activeConversation, initialMessages = [] }: Chat
               >
                 <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
                 <p className="text-xs opacity-70 mt-1">
-                  {msg.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                  {new Date(msg.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                 </p>
               </div>
             </div>
@@ -155,10 +185,16 @@ export function ChatInterface({ activeConversation, initialMessages = [] }: Chat
                 onKeyPress={handleKeyPress}
                 className="min-h-[60px] resize-none"
                 rows={2}
+                disabled={!activeConversation}
               />
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button onClick={handleSendMessage} size="icon" className="self-end">
+                  <Button 
+                    onClick={handleSendMessage} 
+                    size="icon" 
+                    className="self-end"
+                    disabled={!message.trim() && attachedFiles.length === 0}
+                  >
                     <Send className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>

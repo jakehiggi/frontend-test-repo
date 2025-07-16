@@ -1,3 +1,4 @@
+// frontend/src/stores/chatStore.ts
 import { create } from 'zustand'
 import { persist, devtools } from 'zustand/middleware'
 import type { Conversation, Message, AIModel } from '@/types/chat'
@@ -10,8 +11,9 @@ interface ChatStore {
   sidebarOpen: boolean
   selectedModel: AIModel | null
   isLoading: boolean
+  error: string | null
 
-  // Actions
+  // Actions - all functions need stable references
   setConversations: (conversations: Conversation[]) => void
   setActiveConversation: (conversation: Conversation | null) => void
   addConversation: (conversation: Conversation) => void
@@ -23,6 +25,8 @@ interface ChatStore {
   setSidebarOpen: (open: boolean) => void
   setSelectedModel: (model: AIModel | null) => void
   setLoading: (isLoading: boolean) => void
+  setError: (error: string | null) => void
+  clearError: () => void
 
   // Async actions
   loadConversation: (id: number) => Promise<{ conversation: Conversation; messages: Message[] } | null>
@@ -33,7 +37,7 @@ interface ChatStore {
 
 const mockApiDelay = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms))
 
-// Store messages per conversation
+// Store messages per conversation - moved outside to avoid recreation
 const conversationMessages: Record<number, Message[]> = {
   1: [
     {
@@ -93,20 +97,18 @@ export const useChatStore = create<ChatStore>()(
         sidebarOpen: false,
         selectedModel: null,
         isLoading: false,
+        error: null,
 
-        // Actions
-        setConversations: (conversations: Conversation[]) => set({ conversations }),
+        // Actions - using stable function references
+        setConversations: (conversations) => set({ conversations }),
         
-        setActiveConversation: (conversation: Conversation | null) => {
-          // Don't clear messages here - let loadConversation handle it
-          set({ activeConversation: conversation })
-        },
+        setActiveConversation: (conversation) => set({ activeConversation: conversation }),
         
-        addConversation: (conversation: Conversation) => set((state) => ({
+        addConversation: (conversation) => set((state) => ({
           conversations: [conversation, ...state.conversations]
         })),
         
-        deleteConversation: (id: number) => set((state) => {
+        deleteConversation: (id) => set((state) => {
           // Clean up messages for deleted conversation
           if (conversationMessages[id]) {
             delete conversationMessages[id]
@@ -119,7 +121,7 @@ export const useChatStore = create<ChatStore>()(
           }
         }),
         
-        renameConversation: (id: number, newTitle: string) => set((state) => ({
+        renameConversation: (id, newTitle) => set((state) => ({
           conversations: state.conversations.map(conv => 
             conv.id === id ? { ...conv, title: newTitle, updatedAt: new Date() } : conv
           ),
@@ -128,9 +130,9 @@ export const useChatStore = create<ChatStore>()(
             : state.activeConversation
         })),
         
-        setMessages: (messages: Message[]) => set({ messages }),
+        setMessages: (messages) => set({ messages }),
         
-        addMessage: (message: Message) => set((state) => {
+        addMessage: (message) => set((state) => {
           const newMessages = [...state.messages, message]
           
           // Store message in conversation-specific storage
@@ -145,14 +147,18 @@ export const useChatStore = create<ChatStore>()(
           sidebarOpen: !state.sidebarOpen 
         })),
         
-        setSidebarOpen: (open: boolean) => set({ sidebarOpen: open }),
+        setSidebarOpen: (open) => set({ sidebarOpen: open }),
         
-        setSelectedModel: (model: AIModel | null) => set({ selectedModel: model }),
+        setSelectedModel: (model) => set({ selectedModel: model }),
         
-        setLoading: (isLoading: boolean) => set({ isLoading }),
+        setLoading: (isLoading) => set({ isLoading }),
+
+        setError: (error) => set({ error }),
+
+        clearError: () => set({ error: null }),
 
         // Async actions
-        loadConversation: async (id: number) => {
+        loadConversation: async (id) => {
           const state = get()
           
           // Don't reload if already active
@@ -163,47 +169,59 @@ export const useChatStore = create<ChatStore>()(
             }
           }
 
-          set({ isLoading: true })
+          set({ isLoading: true, error: null })
           
           try {
-            await mockApiDelay(100) // Shorter delay for better UX
+            await mockApiDelay(300)
             
             const conversation = state.conversations.find(conv => conv.id === id)
             
             if (!conversation) {
-              set({ isLoading: false })
+              set({ isLoading: false, error: 'Conversation not found' })
               return null
             }
 
-            // Get stored messages for this conversation
-            const messages = conversationMessages[id] || []
+            // Ensure dates are Date objects
+            const normalizedConversation = {
+              ...conversation,
+              createdAt: conversation.createdAt instanceof Date ? conversation.createdAt : new Date(conversation.createdAt),
+              updatedAt: conversation.updatedAt instanceof Date ? conversation.updatedAt : new Date(conversation.updatedAt)
+            }
+
+            // Get stored messages for this conversation and normalize timestamps
+            const storedMessages = conversationMessages[id] || []
+            const normalizedMessages = storedMessages.map(msg => ({
+              ...msg,
+              timestamp: msg.timestamp instanceof Date ? msg.timestamp : new Date(msg.timestamp)
+            }))
             
             set({ 
-              activeConversation: conversation,
-              messages: messages,
-              isLoading: false
+              activeConversation: normalizedConversation,
+              messages: normalizedMessages,
+              isLoading: false,
+              error: null
             })
             
-            return { conversation, messages }
+            return { conversation: normalizedConversation, messages: normalizedMessages }
           } catch (error) {
-            set({ isLoading: false })
-            console.error('Failed to load conversation:', error)
+            const errorMessage = error instanceof Error ? error.message : 'Failed to load conversation'
+            set({ isLoading: false, error: errorMessage })
             throw error
           }
         },
 
         createNewConversation: async () => {
-          set({ isLoading: true })
+          set({ isLoading: true, error: null })
           
           try {
-            await mockApiDelay(300)
+            await mockApiDelay(500)
             
             const now = new Date()
             const newConversation: Conversation = {
-              id: Date.now(), // Use timestamp as ID
+              id: Date.now(),
               title: "New Conversation",
               date: now.toISOString().split("T")[0],
-              preview: "",
+              preview: "Start your conversation...",
               createdAt: now,
               updatedAt: now,
             }
@@ -215,22 +233,23 @@ export const useChatStore = create<ChatStore>()(
               conversations: [newConversation, ...state.conversations],
               activeConversation: newConversation,
               messages: [],
-              isLoading: false
+              isLoading: false,
+              error: null
             }))
             
             return newConversation
           } catch (error) {
-            set({ isLoading: false })
-            console.error('Failed to create conversation:', error)
+            const errorMessage = error instanceof Error ? error.message : 'Failed to create conversation'
+            set({ isLoading: false, error: errorMessage })
             throw error
           }
         },
 
-        deleteConversationAsync: async (id: number) => {
-          set({ isLoading: true })
+        deleteConversationAsync: async (id) => {
+          set({ isLoading: true, error: null })
           
           try {
-            await mockApiDelay(200)
+            await mockApiDelay(300)
             
             // Clean up stored messages
             if (conversationMessages[id]) {
@@ -241,33 +260,39 @@ export const useChatStore = create<ChatStore>()(
               conversations: state.conversations.filter(conv => conv.id !== id),
               activeConversation: state.activeConversation?.id === id ? null : state.activeConversation,
               messages: state.activeConversation?.id === id ? [] : state.messages,
-              isLoading: false
+              isLoading: false,
+              error: null
             }))
           } catch (error) {
-            set({ isLoading: false })
-            console.error('Failed to delete conversation:', error)
+            const errorMessage = error instanceof Error ? error.message : 'Failed to delete conversation'
+            set({ isLoading: false, error: errorMessage })
             throw error
           }
         },
 
-        renameConversationAsync: async (id: number, newTitle: string) => {
-          set({ isLoading: true })
+        renameConversationAsync: async (id, newTitle) => {
+          if (!newTitle.trim()) {
+            throw new Error('Title cannot be empty')
+          }
+
+          set({ isLoading: true, error: null })
           
           try {
-            await mockApiDelay(200)
+            await mockApiDelay(300)
             
             set((state) => ({
               conversations: state.conversations.map(conv => 
-                conv.id === id ? { ...conv, title: newTitle, updatedAt: new Date() } : conv
+                conv.id === id ? { ...conv, title: newTitle.trim(), updatedAt: new Date() } : conv
               ),
               activeConversation: state.activeConversation?.id === id 
-                ? { ...state.activeConversation, title: newTitle }
+                ? { ...state.activeConversation, title: newTitle.trim() }
                 : state.activeConversation,
-              isLoading: false
+              isLoading: false,
+              error: null
             }))
           } catch (error) {
-            set({ isLoading: false })
-            console.error('Failed to rename conversation:', error)
+            const errorMessage = error instanceof Error ? error.message : 'Failed to rename conversation'
+            set({ isLoading: false, error: errorMessage })
             throw error
           }
         },
@@ -278,8 +303,19 @@ export const useChatStore = create<ChatStore>()(
           conversations: state.conversations,
           selectedModel: state.selectedModel,
           sidebarOpen: state.sidebarOpen
-          // Don't persist messages - they're handled separately
+          // Don't persist messages, activeConversation, loading states, errors, or function references
         }),
+        // Add onRehydrateStorage to handle Date deserialization
+        onRehydrateStorage: () => (state) => {
+          if (state?.conversations) {
+            // Convert string dates back to Date objects
+            state.conversations = state.conversations.map(conv => ({
+              ...conv,
+              createdAt: new Date(conv.createdAt),
+              updatedAt: new Date(conv.updatedAt)
+            }))
+          }
+        },
       }
     ),
     { name: 'chat-store' }
