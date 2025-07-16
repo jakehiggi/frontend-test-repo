@@ -15,8 +15,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { FileBreadcrumbs } from "./file-system/FileBreadcrumbs"
 import { FileListView } from "./file-system/FileListView"
-import { useFileSystem } from "@/hooks/useFileSystem"
-import { useRecentFiles } from "@/hooks/useRecentFiles"
+import { useFiles } from "@/hooks/useFiles"
 import type { FileItem, FileSizeLimits } from "@/types/file-system"
 
 interface FileAttachmentDialogProps {
@@ -27,50 +26,31 @@ interface FileAttachmentDialogProps {
 }
 
 const ATTACHMENT_SIZE_LIMITS: FileSizeLimits = {
-  maxFileSize: 20 * 1024 * 1024, // 20MB per file
+  maxFileSize: 25 * 1024 * 1024, // 25MB per file
   maxTotalSize: 100 * 1024 * 1024, // 100MB total
   maxFileCount: 5, // 5 files max
 }
-
-// Mock generated documents for the attachment dialog
-const mockGeneratedFiles = [
-  {
-    id: "gen_1",
-    name: "Project Summary.pdf",
-    type: "file" as const,
-    size: 245760,
-    lastModified: new Date("2024-01-15T10:30:00"),
-    parentId: null,
-    path: "/Project Summary.pdf",
-    mimeType: "application/pdf",
-  },
-  {
-    id: "gen_2",
-    name: "Meeting Notes.docx",
-    type: "file" as const,
-    size: 89120,
-    lastModified: new Date("2024-01-14T14:20:00"),
-    parentId: null,
-    path: "/Meeting Notes.docx",
-    mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-  },
-]
 
 export function FileAttachmentDialog({ open, onOpenChange, onAttachFiles, selectedFiles }: FileAttachmentDialogProps) {
   const [activeTab, setActiveTab] = useState("recent")
   const [tempSelectedFiles, setTempSelectedFiles] = useState<FileItem[]>(selectedFiles)
 
-  const { recentFiles, addRecentFile, clearRecentFiles } = useRecentFiles()
+  // Use the Files hook for both user and generated files
+  const {
+    currentFiles,
+    currentPath,
+    breadcrumbs,
+    recentFiles,
+    navigateToPath,
+    store,
+  } = useFiles()
 
-  // User documents file system
-  const userDocsSystem = useFileSystem()
-  const userCurrentItems = userDocsSystem.getCurrentItems()
-  const userBreadcrumbs = userDocsSystem.getBreadcrumbs()
+  // Get generated files from store
+  const generatedFiles = store.generatedFiles
+  const userFiles = store.userFiles
 
-  // Generated documents file system
-  const generatedDocsSystem = useFileSystem(mockGeneratedFiles)
-  const generatedCurrentItems = generatedDocsSystem.getCurrentItems()
-  const generatedBreadcrumbs = generatedDocsSystem.getBreadcrumbs()
+  // Simple breadcrumbs for generated files (since they're all in root)
+  const generatedBreadcrumbs = [{ id: "root", name: "Generated Documents", path: "/" }]
 
   const handleFileSelect = (file: FileItem) => {
     if (file.type === "folder") return
@@ -90,12 +70,12 @@ export function FileAttachmentDialog({ open, onOpenChange, onAttachFiles, select
   }
 
   const handleFileAccess = (file: FileItem) => {
-    addRecentFile(file)
+    store.addToRecentFiles(file)
   }
 
   const handleAttach = () => {
     // Add all selected files to recent files
-    tempSelectedFiles.forEach((file) => addRecentFile(file))
+    tempSelectedFiles.forEach((file) => store.addToRecentFiles(file))
     onAttachFiles(tempSelectedFiles)
     onOpenChange(false)
   }
@@ -122,6 +102,37 @@ export function FileAttachmentDialog({ open, onOpenChange, onAttachFiles, select
       tempSelectedFiles.length > ATTACHMENT_SIZE_LIMITS.maxFileCount ||
       getTotalSize() > ATTACHMENT_SIZE_LIMITS.maxTotalSize
     )
+  }
+
+  // Get current files based on active tab
+  const getCurrentTabFiles = () => {
+    if (activeTab === "recent") return recentFiles
+    if (activeTab === "user-documents") return currentFiles
+    if (activeTab === "generated-documents") return generatedFiles
+    return []
+  }
+
+  const getCurrentTabBreadcrumbs = () => {
+    if (activeTab === "user-documents") return breadcrumbs
+    if (activeTab === "generated-documents") return generatedBreadcrumbs
+    return []
+  }
+
+  const handleNavigate = (path: string) => {
+    if (activeTab === "user-documents") {
+      navigateToPath(path)
+    }
+    // Generated documents don't have navigation since they're flat
+  }
+
+  const handleFolderClick = (folderId: string) => {
+    if (activeTab === "user-documents") {
+      const folder = store.getFileById(folderId)
+      if (folder && folder.type === "folder") {
+        navigateToPath(folder.path)
+      }
+    }
+    // Generated documents don't have folders
   }
 
   return (
@@ -162,7 +173,7 @@ export function FileAttachmentDialog({ open, onOpenChange, onAttachFiles, select
                       {recentFiles.length > 0 && (
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <Button variant="ghost" size="sm" onClick={clearRecentFiles}>
+                            <Button variant="ghost" size="sm" onClick={() => store.clearRecentFiles()}>
                               <Trash2 className="h-4 w-4 mr-2" />
                               Clear
                             </Button>
@@ -189,10 +200,10 @@ export function FileAttachmentDialog({ open, onOpenChange, onAttachFiles, select
 
                 <TabsContent value="user-documents" className="h-full m-0">
                   <div className="flex flex-col h-full">
-                    <FileBreadcrumbs breadcrumbs={userBreadcrumbs} onNavigate={userDocsSystem.navigateToPath} />
+                    <FileBreadcrumbs breadcrumbs={breadcrumbs} onNavigate={handleNavigate} />
                     <FileListView
-                      items={userCurrentItems}
-                      onFolderClick={userDocsSystem.navigateToFolder}
+                      items={currentFiles}
+                      onFolderClick={handleFolderClick}
                       onCreateFolder={() => {}} // Disabled in selection mode
                       onRenameItem={() => {}} // Disabled in selection mode
                       onDeleteItem={() => {}} // Disabled in selection mode
@@ -208,13 +219,10 @@ export function FileAttachmentDialog({ open, onOpenChange, onAttachFiles, select
 
                 <TabsContent value="generated-documents" className="h-full m-0">
                   <div className="flex flex-col h-full">
-                    <FileBreadcrumbs
-                      breadcrumbs={generatedBreadcrumbs}
-                      onNavigate={generatedDocsSystem.navigateToPath}
-                    />
+                    <FileBreadcrumbs breadcrumbs={generatedBreadcrumbs} onNavigate={() => {}} />
                     <FileListView
-                      items={generatedCurrentItems}
-                      onFolderClick={generatedDocsSystem.navigateToFolder}
+                      items={generatedFiles}
+                      onFolderClick={() => {}} // No folders in generated documents
                       onCreateFolder={() => {}} // Disabled in selection mode
                       onRenameItem={() => {}} // Disabled in selection mode
                       onDeleteItem={() => {}} // Disabled in selection mode

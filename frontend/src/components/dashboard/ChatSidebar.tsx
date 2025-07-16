@@ -1,9 +1,7 @@
 "use client"
 
-import React from "react"
+import React, { useState, useMemo } from "react"
 import { Link } from "react-router-dom"
-
-import { useState } from "react"
 import {
   Search,
   Plus,
@@ -42,24 +40,29 @@ import { Input } from "@/components/ui/input"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { cn } from "@/lib/utils"
 import type { ChatSidebarProps, Conversation, SortOrder, SortType } from "@/types/chat"
-import { useConversations } from "@/hooks/useConversations"
+import { useChat } from "@/hooks/useChat"
 
 export function ChatSidebar({ isOpen, onToggle, activeConversationId, onConversationSelect }: ChatSidebarProps) {
   const [searchQuery, setSearchQuery] = useState("")
   const [sortBy, setSortBy] = useState<SortType>("date")
   const [sortOrder, setSortOrder] = useState<SortOrder>("desc")
-  const [filteredConversations, setFilteredConversations] = useState<Conversation[]>([])
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [renameDialogOpen, setRenameDialogOpen] = useState(false)
   const [conversationToDelete, setConversationToDelete] = useState<number | null>(null)
   const [conversationToRename, setConversationToRename] = useState<Conversation | null>(null)
   const [newTitle, setNewTitle] = useState("")
 
-  const { conversations, isLoading, createNewConversation, deleteConversation, renameConversation, loadConversation } =
-    useConversations()
+  // Use Zustand store
+  const {
+    conversations,
+    isLoading,
+    createConversation,
+    deleteConversation,
+    renameConversation,
+  } = useChat()
 
-  // Update filtered conversations when conversations change
-  React.useEffect(() => {
+  // Filter and sort conversations
+  const filteredConversations = useMemo(() => {
     let filtered = conversations
 
     if (searchQuery.trim()) {
@@ -85,7 +88,7 @@ export function ChatSidebar({ isOpen, onToggle, activeConversationId, onConversa
       return sortOrder === "asc" ? comparison : -comparison
     })
 
-    setFilteredConversations(sorted)
+    return sorted
   }, [conversations, searchQuery, sortBy, sortOrder])
 
   const handleSearch = (query: string) => {
@@ -94,10 +97,8 @@ export function ChatSidebar({ isOpen, onToggle, activeConversationId, onConversa
 
   const handleSort = (type: SortType) => {
     if (sortBy === type) {
-      // Toggle sort order if clicking the same sort type
       setSortOrder(sortOrder === "asc" ? "desc" : "asc")
     } else {
-      // Set new sort type with default order
       setSortBy(type)
       setSortOrder(type === "date" ? "desc" : "asc")
     }
@@ -105,7 +106,7 @@ export function ChatSidebar({ isOpen, onToggle, activeConversationId, onConversa
 
   const handleNewChat = async () => {
     try {
-      const newConversation = await createNewConversation()
+      const newConversation = await createConversation()
       onConversationSelect(newConversation)
     } catch (error) {
       console.error("Failed to create new conversation:", error)
@@ -152,12 +153,9 @@ export function ChatSidebar({ isOpen, onToggle, activeConversationId, onConversa
 
   const handleConversationClick = async (conversation: Conversation) => {
     try {
-      const result = await loadConversation(conversation.id)
-      if (result) {
-        onConversationSelect(conversation)
-      }
+      onConversationSelect(conversation)
     } catch (error) {
-      console.error("Failed to load conversation:", error)
+      console.error("Failed to select conversation:", error)
     }
   }
 
@@ -188,7 +186,7 @@ export function ChatSidebar({ isOpen, onToggle, activeConversationId, onConversa
                 </AccordionTrigger>
                 <AccordionContent className="px-2 pb-4">
                   <div className="space-y-3">
-                    {/* New Chat Button - Sleeker and smaller */}
+                    {/* New Chat Button */}
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <Button
@@ -239,6 +237,17 @@ export function ChatSidebar({ isOpen, onToggle, activeConversationId, onConversa
                         </TooltipTrigger>
                         <TooltipContent>Sort by date {sortBy === "date" && `(${sortOrder})`}</TooltipContent>
                       </Tooltip>
+                    </div>
+
+                    {/* Search */}
+                    <div className="relative">
+                      <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        placeholder="Search conversations..."
+                        value={searchQuery}
+                        onChange={(e) => handleSearch(e.target.value)}
+                        className="pl-8 h-9"
+                      />
                     </div>
 
                     {/* Conversations List */}
@@ -312,17 +321,6 @@ export function ChatSidebar({ isOpen, onToggle, activeConversationId, onConversa
                           </div>
                         ))
                       )}
-                    </div>
-
-                    {/* Search */}
-                    <div className="relative">
-                      <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        placeholder="Search conversations..."
-                        value={searchQuery}
-                        onChange={(e) => handleSearch(e.target.value)}
-                        className="pl-8 h-9"
-                      />
                     </div>
                   </div>
                 </AccordionContent>

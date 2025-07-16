@@ -1,51 +1,83 @@
 "use client"
 
-import { useFileSystem } from "@/hooks/useFileSystem"
 import { FileBreadcrumbs } from "./file-system/FileBreadcrumbs"
 import { FileListView } from "./file-system/FileListView"
+import { useFiles } from "@/hooks/useFiles"
 
 export function UserDocuments() {
   const {
+    currentFiles,
     currentPath,
-    createFolder,
+    breadcrumbs,
     uploadFile,
-    renameItem,
-    deleteItem,
-    rollbackFile,
-    compressFile, // New: for compressing files
-    getCurrentItems,
+    createFolder,
     navigateToPath,
-    navigateToFolder,
-    getBreadcrumbs,
-  } = useFileSystem()
-
-  const currentItems = getCurrentItems()
-  const breadcrumbs = getBreadcrumbs()
+    renameFile,
+    deleteFile,
+    store,
+  } = useFiles()
 
   const handleCreateFolder = (name: string) => {
-    const currentFolderId =
-      currentPath === "/" ? null : getCurrentItems().find((item) => item.type === "folder")?.parentId || null
-    createFolder(name, currentFolderId)
+    createFolder(name, false)
   }
 
   const handleUploadFile = (file: File) => {
-    const currentFolderId =
-      currentPath === "/" ? null : getCurrentItems().find((item) => item.type === "folder")?.parentId || null
-    uploadFile(file, currentFolderId)
+    uploadFile(file, false)
+  }
+
+  const handleRenameItem = (id: string, newName: string) => {
+    renameFile(id, newName, false)
+  }
+
+  const handleDeleteItem = (id: string) => {
+    deleteFile(id, false)
+  }
+
+  const handleRollbackFile = (fileId: string, versionId: string) => {
+    const file = store.getFileById(fileId)
+    if (file?.versions) {
+      const version = file.versions.find(v => v.versionId === versionId)
+      if (version) {
+        store.updateFile(fileId, {
+          content: version.content,
+          size: version.size,
+          lastModified: new Date(),
+        }, false)
+      }
+    }
+  }
+
+  const handleCompressFile = (fileId: string) => {
+    const file = store.getFileById(fileId)
+    if (file && !file.isCompressed) {
+      const compressedSize = Math.max(1, Math.floor((file.size || 0) * 0.5))
+      store.updateFile(fileId, {
+        size: compressedSize,
+        content: `[COMPRESSED] ${file.content || ""}`,
+        isCompressed: true,
+      }, false)
+    }
+  }
+
+  const navigateToFolder = (folderId: string) => {
+    const folder = store.getFileById(folderId)
+    if (folder && folder.type === "folder") {
+      navigateToPath(folder.path)
+    }
   }
 
   return (
     <div className="flex flex-col h-full">
       <FileBreadcrumbs breadcrumbs={breadcrumbs} onNavigate={navigateToPath} />
       <FileListView
-        items={currentItems}
+        items={currentFiles}
         onFolderClick={navigateToFolder}
         onCreateFolder={handleCreateFolder}
         onUploadFile={handleUploadFile}
-        onRenameItem={renameItem}
-        onDeleteItem={deleteItem}
-        onRollbackFile={rollbackFile}
-        onCompressFile={compressFile} // Pass compress function
+        onRenameItem={handleRenameItem}
+        onDeleteItem={handleDeleteItem}
+        onRollbackFile={handleRollbackFile}
+        onCompressFile={handleCompressFile}
         allowUpload={true}
       />
     </div>

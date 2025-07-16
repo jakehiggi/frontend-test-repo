@@ -1,57 +1,27 @@
-// frontend/src/components/dashboard/ChatDashboard.tsx (Updated)
 "use client"
 
-import { useState } from "react"
 import { cn } from "@/lib/utils"
 import { ChatSidebar } from "./ChatSidebar"
 import { TopNavigation } from "./TopNavigation"
 import { Footer } from "./Footer"
-import { LoadingOverlay } from "./LoadingOverlay"
-import type { Conversation, Message } from "@/types/chat"
-import { useConversations } from "@/hooks/useConversations"
-import { useAuth } from "@/contexts/AuthContext"
 import { TabbedMainSection } from "./TabbedMainSection"
+import { useChat } from "@/hooks/useChat"
+import type { Conversation } from "@/types/chat"
 
-export function ChatDashboard() {
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [activeConversation, setActiveConversation] = useState<Conversation | null>(null)
-  const [conversationMessages, setConversationMessages] = useState<Message[]>([])
+interface ChatDashboardProps {
+  onSignOut: () => void
+  isSigningOut?: boolean
+}
 
-  const { logout, isLoading: authLoading } = useAuth()
-  const { loadConversation } = useConversations()
-
-  const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen)
-  }
+export function ChatDashboard({ onSignOut, isSigningOut = false }: ChatDashboardProps) {
+  const { activeConversation, messages, sidebarOpen, toggleSidebar, selectConversation } = useChat()
 
   const handleConversationSelect = async (conversation: Conversation) => {
-    setActiveConversation(conversation)
-
     try {
-      const result = await loadConversation(conversation.id)
-      if (result) {
-        setConversationMessages(result.messages)
-      } else {
-        // For new conversations, start with empty messages
-        setConversationMessages([])
-      }
+      await selectConversation(conversation)
     } catch (error) {
-      console.error("Failed to load conversation messages:", error)
-      setConversationMessages([])
+      console.error("Failed to load conversation:", error)
     }
-  }
-
-  const handleSignOut = async () => {
-    try {
-      await logout()
-      // Navigation will be handled by the App component based on auth state
-    } catch (error) {
-      console.error("Sign out error:", error)
-    }
-  }
-
-  if (authLoading) {
-    return <LoadingOverlay message="Loading your dashboard..." />
   }
 
   return (
@@ -69,9 +39,12 @@ export function ChatDashboard() {
           sidebarOpen ? "md:ml-80" : "ml-0",
         )}
       >
-        <TopNavigation onSignOut={handleSignOut} isSigningOut={authLoading} />
+        <TopNavigation onSignOut={onSignOut} isSigningOut={isSigningOut} />
         <main className="flex-1 min-h-0">
-          <TabbedMainSection activeConversation={activeConversation} initialMessages={conversationMessages} />
+          <TabbedMainSection 
+            activeConversation={activeConversation} 
+            initialMessages={messages} 
+          />
         </main>
       </div>
 

@@ -1,12 +1,12 @@
 "use client"
 
-import { useState } from "react"
-import { MessageSquare, FileText, Sparkles } from "lucide-react"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ChatInterface } from "./ChatInterface"
 import { UserDocuments } from "./UserDocuments"
 import { GeneratedDocuments } from "./GeneratedDocuments"
+import { MessageSquare, FileText, Sparkles } from "lucide-react"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import type { Conversation, Message } from "@/types/chat"
+import { useUI } from "@/hooks/useUI"
 
 interface TabbedMainSectionProps {
   activeConversation: Conversation | null
@@ -14,7 +14,7 @@ interface TabbedMainSectionProps {
 }
 
 export function TabbedMainSection({ activeConversation, initialMessages = [] }: TabbedMainSectionProps) {
-  const [activeTab, setActiveTab] = useState("chat")
+  const { activeTab, setActiveTab } = useUI()
 
   return (
     <div className="flex flex-col h-full">

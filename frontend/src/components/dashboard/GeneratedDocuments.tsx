@@ -1,79 +1,87 @@
 "use client"
 
-import { useFileSystem } from "@/hooks/useFileSystem"
 import { FileBreadcrumbs } from "./file-system/FileBreadcrumbs"
 import { FileListView } from "./file-system/FileListView"
-
-// Mock generated documents
-const mockGeneratedFiles = [
-  {
-    id: "gen_1",
-    name: "Project Summary.pdf",
-    type: "file" as const,
-    size: 245760,
-    lastModified: new Date("2024-01-15T10:30:00"),
-    parentId: null,
-    path: "/Project Summary.pdf",
-    mimeType: "application/pdf",
-    content: "This is the content of the generated project summary.",
-    versions: [
-      {
-        versionId: "gen_1_v1",
-        lastModified: new Date("2024-01-14T09:00:00"),
-        size: 200000,
-        content: "Initial draft of the project summary.",
-      },
-    ],
-  },
-  {
-    id: "gen_2",
-    name: "Meeting Notes.docx",
-    type: "file" as const,
-    size: 89120,
-    lastModified: new Date("2024-01-14T14:20:00"),
-    parentId: null,
-    path: "/Meeting Notes.docx",
-    mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-    content: "Detailed notes from the team meeting.",
-    versions: [],
-  },
-]
+import { useFiles } from "@/hooks/useFiles"
 
 export function GeneratedDocuments() {
-  const {
-    currentPath,
-    createFolder,
-    renameItem,
-    deleteItem,
-    rollbackFile,
-    compressFile, // New: for compressing files
-    getCurrentItems,
-    navigateToPath,
-    navigateToFolder,
-    getBreadcrumbs,
-  } = useFileSystem(mockGeneratedFiles)
+  const { store } = useFiles()
 
-  const currentItems = getCurrentItems()
-  const breadcrumbs = getBreadcrumbs()
+  // Get generated files from the store
+  const generatedFiles = store.generatedFiles
+  
+  // Simple breadcrumbs for generated documents (they're all in root)
+  const breadcrumbs = [{ id: "root", name: "Generated Documents", path: "/" }]
 
   const handleCreateFolder = (name: string) => {
-    const currentFolderId =
-      currentPath === "/" ? null : getCurrentItems().find((item) => item.type === "folder")?.parentId || null
-    createFolder(name, currentFolderId)
+    // Create folder in generated documents
+    const newFolder = {
+      id: `gen_folder_${Date.now()}`,
+      name,
+      type: "folder" as const,
+      lastModified: new Date(),
+      parentId: null,
+      path: `/${name}`,
+    }
+    store.addFile(newFolder, true) // true = generated file
+  }
+
+  const handleRenameItem = (id: string, newName: string) => {
+    store.renameFile(id, newName, true) // true = generated file
+  }
+
+  const handleDeleteItem = (id: string) => {
+    store.deleteFile(id, true) // true = generated file
+  }
+
+  const handleRollbackFile = (fileId: string, versionId: string) => {
+    const file = store.getFileById(fileId)
+    if (file?.versions) {
+      const version = file.versions.find(v => v.versionId === versionId)
+      if (version) {
+        store.updateFile(fileId, {
+          content: version.content,
+          size: version.size,
+          lastModified: new Date(),
+        }, true) // true = generated file
+      }
+    }
+  }
+
+  const handleCompressFile = (fileId: string) => {
+    const file = store.getFileById(fileId)
+    if (file && !file.isCompressed) {
+      const compressedSize = Math.max(1, Math.floor((file.size || 0) * 0.5))
+      store.updateFile(fileId, {
+        size: compressedSize,
+        content: `[COMPRESSED] ${file.content || ""}`,
+        isCompressed: true,
+      }, true) // true = generated file
+    }
+  }
+
+  const navigateToFolder = (folderId: string) => {
+    // For now, generated documents are flat, but this could be extended
+    console.log('Navigate to folder:', folderId)
+  }
+
+  const navigateToPath = (path: string) => {
+    // For now, generated documents are flat, but this could be extended
+    console.log('Navigate to path:', path)
   }
 
   return (
     <div className="flex flex-col h-full">
       <FileBreadcrumbs breadcrumbs={breadcrumbs} onNavigate={navigateToPath} />
       <FileListView
-        items={currentItems}
+        items={generatedFiles}
         onFolderClick={navigateToFolder}
         onCreateFolder={handleCreateFolder}
-        onRenameItem={renameItem}
-        onDeleteItem={deleteItem}
-        onRollbackFile={rollbackFile}
-        onCompressFile={compressFile} // Pass compress function
-        allowUpload={false}
+        onRenameItem={handleRenameItem}
+        onDeleteItem={handleDeleteItem}
+        onRollbackFile={handleRollbackFile}
+        onCompressFile={handleCompressFile}
+        allowUpload={false} // Generated documents are created by AI, not uploaded
       />
     </div>
   )
