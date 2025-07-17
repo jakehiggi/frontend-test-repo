@@ -7,7 +7,22 @@ const scrollToSection = (sectionId: string) => {
   }
 };
 
+const handleNavigation = (sectionId: string) => {
+  const currentPath = window.location.pathname;
+  
+  // If we're not on the landing page, navigate to landing page first
+  if (currentPath !== '/') {
+    window.location.href = `/#${sectionId}`;
+    return;
+  }
+  
+  // If we're on the landing page, scroll to the section
+  scrollToSection(sectionId);
+};
+
 export default function Footer() {
+  const isLandingPage = window.location.pathname === '/';
+
   return (
     <footer className="bg-muted/30 text-foreground transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -45,7 +60,7 @@ export default function Footer() {
               ].map((item) => (
                 <li key={item.name}>
                   <button 
-                    onClick={() => scrollToSection(item.id)}
+                    onClick={() => isLandingPage ? scrollToSection(item.id) : handleNavigation(item.id)}
                     className="text-muted-foreground hover:text-foreground transition-colors duration-200 text-sm"
                   >
                     {item.name}

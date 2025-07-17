@@ -194,14 +194,14 @@ export default function CompleteLandingPage() {
                 bio: "Paul has led complex, mission-critical programmes on five continents, delivering digital transformation projects for FTSE 100 firms and high-growth scale-ups alike. A qualified programme/project manager and former Royal Navy officer, he now orchestrates Levare's day-to-day operations, product roadmap, and client implementation teams. Paul's hands-on, military-grade project discipline with agile delivery methods, ensuring every release of Dedalus meets enterprise-class reliability and security standards. His front covers resource planning, global partner ecosystems, and customer success, making him the engine room of Levare's rapid, quality-centred growth."
               }
             ].map((member, index) => (
-              <Card key={index} className="bg-card border-border">
+              <Card key={index} className="bg-card border-border min-h-[400px]">
                 <CardContent className="p-5">
                   <div className="aspect-square bg-muted rounded-lg mb-3 flex items-center justify-center">
                     <User className="w-12 h-12 text-muted-foreground" />
                   </div>
                   <h3 className="text-lg font-bold mb-1 text-foreground">{member.name}</h3>
-                  <p className="text-muted-foreground text-xs font-medium mb-3">{member.title}</p>
-                  <p className="text-muted-foreground text-xs leading-relaxed line-clamp-6">{member.bio}</p>
+                  <p className="text-muted-foreground text-m font-medium mb-3">{member.title}</p>
+                  <p className="text-muted-foreground text-s leading-relaxed line-clamp-10">{member.bio}</p>
                 </CardContent>
               </Card>
             ))}
@@ -227,8 +227,8 @@ export default function CompleteLandingPage() {
                     <User className="w-12 h-12 text-muted-foreground" />
                   </div>
                   <h3 className="text-lg font-bold mb-1 text-foreground">{member.name}</h3>
-                  <p className="text-muted-foreground text-xs font-medium mb-3">{member.title}</p>
-                  <p className="text-muted-foreground text-xs leading-relaxed">{member.bio}</p>
+                  <p className="text-muted-foreground text-m font-medium mb-3">{member.title}</p>
+                  <p className="text-muted-foreground text-s leading-relaxed">{member.bio}</p>
                 </CardContent>
               </Card>
             ))}
