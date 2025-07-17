@@ -279,7 +279,6 @@ export function ChatSidebar({ isOpen, onToggle, activeConversationId, onConversa
 
                             {/* Action Buttons */}
                             <div className="absolute bottom-1 right-1 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        variant="ghost"
                               <Tooltip>
                                 <TooltipTrigger asChild>
                                   <Button

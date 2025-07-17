@@ -2,6 +2,13 @@ import ThemeToggle from "../ThemeToggle";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 
+const scrollToSection = (sectionId: string) => {
+  const element = document.getElementById(sectionId);
+  if (element) {
+    element.scrollIntoView({ behavior: 'smooth' });
+  }
+};
+
 export default function Navigation() {
   return (
     <nav className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
@@ -13,16 +20,28 @@ export default function Navigation() {
             </Link>
           </div>
           <div className="flex items-center space-x-6">
-            <button className="text-muted-foreground hover:text-foreground transition-colors duration-200 font-medium">
+            <button 
+              onClick={() => scrollToSection('what-levare-does')}
+              className="text-muted-foreground hover:text-foreground transition-colors duration-200 font-medium"
+            >
               What Levare AI Does
             </button>
-            <button className="text-muted-foreground hover:text-foreground transition-colors duration-200 font-medium">
-              Levare Intelligent Agents
+            <button 
+              onClick={() => scrollToSection('about')}
+              className="text-muted-foreground hover:text-foreground transition-colors duration-200 font-medium"
+            >
+              About Levare AI
             </button>
-            <button className="text-muted-foreground hover:text-foreground transition-colors duration-200 font-medium">
+            <button 
+              onClick={() => scrollToSection('team')}
+              className="text-muted-foreground hover:text-foreground transition-colors duration-200 font-medium"
+            >
               Meet the Team
             </button>
-            <button className="text-muted-foreground hover:text-foreground transition-colors duration-200 font-medium">
+            <button 
+              onClick={() => scrollToSection('contact')}
+              className="text-muted-foreground hover:text-foreground transition-colors duration-200 font-medium"
+            >
               Contact
             </button>
             <ThemeToggle />
