@@ -1,34 +1,113 @@
 import { useEffect, useState } from "react";
 
-type Ripple = { id: number; x: number; y: number; created: number };
-
-export function HeroBackground() {
+export function ModernHeroBackground() {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-  const [lightPos, setLightPos] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      setMousePos({ x: e.clientX, y: e.clientY });
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
 
   return (
-    <div className="absolute inset-0 overflow-hidden">
-      {/* Blobs */}
-      <div className="absolute w-[70vw] h-[70vw] bg-accent opacity-40 blur-2xl rounded-full animate-blob1" />
-      <div className="absolute w-[50vw] h-[50vw] bg-accent opacity-40 blur-2xl rounded-full animate-blob2 top-1/2 left-1/3" />
-      <div className="absolute w-[90vw] h-[90vw] bg-accent opacity-40 blur-2xl rounded-full animate-blob3 top-1/4 left-1/2" />
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      {/* Animated grid background */}
+      <div 
+        className="absolute inset-0 opacity-30"
+        style={{
+          backgroundImage: `
+            linear-gradient(rgba(59, 130, 246, 0.05) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(59, 130, 246, 0.05) 1px, transparent 1px)
+          `,
+          backgroundSize: '50px 50px',
+          transform: `translate(${mousePos.x * 0.01}px, ${mousePos.y * 0.01}px)`,
+          transition: 'transform 0.1s ease-out'
+        }}
+      />
 
-      {/* Mouse Light 
-      <div className="absolute inset-0 pointer-events-none mix-blend-screen">
-        <div
-          className="absolute inset-0 transition-all duration-100"
+      {/* Floating geometric shapes */}
+      <div className="absolute inset-0">
+        {/* Large background circles */}
+        <div 
+          className="absolute w-96 h-96 rounded-full opacity-10"
           style={{
-            background: `radial-gradient(circle at ${lightPos.x}px ${lightPos.y}px, rgba(255, 255, 255, 0.15), transparent 250px)`
+            background: 'linear-gradient(135deg, #3b82f6, #06b6d4)',
+            top: '10%',
+            left: '10%',
+            transform: `translate(${mousePos.x * 0.02}px, ${mousePos.y * 0.02}px)`,
+            filter: 'blur(40px)',
+            animation: 'float 8s ease-in-out infinite',
+            animationDelay: '0s'
           }}
         />
-        <div
-          className="absolute inset-0 transition-all duration-100"
+        
+        <div 
+          className="absolute w-80 h-80 rounded-full opacity-10"
           style={{
-            background: `radial-gradient(circle at ${lightPos.x}px ${lightPos.y}px, rgba(255, 255, 255, 0.08), transparent 450px)`
+            background: 'linear-gradient(135deg, #8b5cf6, #3b82f6)',
+            top: '40%',
+            right: '10%',
+            transform: `translate(${mousePos.x * -0.015}px, ${mousePos.y * 0.015}px)`,
+            filter: 'blur(35px)',
+            animation: 'float 6s ease-in-out infinite',
+            animationDelay: '2s'
           }}
         />
-      </div> */}
+
+        <div 
+          className="absolute w-64 h-64 rounded-full opacity-15"
+          style={{
+            background: 'linear-gradient(135deg, #06b6d4, #10b981)',
+            bottom: '20%',
+            left: '30%',
+            transform: `translate(${mousePos.x * 0.01}px, ${mousePos.y * -0.01}px)`,
+            filter: 'blur(30px)',
+            animation: 'float 10s ease-in-out infinite',
+            animationDelay: '4s'
+          }}
+        />
+
+        {/* Smaller accent shapes */}
+        <div 
+          className="absolute w-32 h-32 rounded-2xl opacity-20"
+          style={{
+            background: 'linear-gradient(135deg, #3b82f6, #1d4ed8)',
+            top: '20%',
+            right: '30%',
+            transform: `rotate(45deg) translate(${mousePos.x * 0.03}px, ${mousePos.y * 0.03}px)`,
+            filter: 'blur(20px)',
+            animation: 'float 7s ease-in-out infinite',
+            animationDelay: '1s'
+          }}
+        />
+
+        <div 
+          className="absolute w-24 h-24 rounded-xl opacity-25"
+          style={{
+            background: 'linear-gradient(135deg, #8b5cf6, #6366f1)',
+            bottom: '30%',
+            right: '20%',
+            transform: `rotate(-30deg) translate(${mousePos.x * -0.02}px, ${mousePos.y * 0.02}px)`,
+            filter: 'blur(15px)',
+            animation: 'float 5s ease-in-out infinite',
+            animationDelay: '3s'
+          }}
+        />
+      </div>
+
+      {/* Subtle radial overlay */}
+      <div 
+        className="absolute inset-0 opacity-50"
+        style={{
+          background: `radial-gradient(circle at ${mousePos.x * 0.1}% ${mousePos.y * 0.1}%, rgba(59, 130, 246, 0.1) 0%, transparent 50%)`
+        }}
+      />
+
+      {/* Bottom gradient fade */}
+      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background/80 to-transparent" />
     </div>
   );
 }
-

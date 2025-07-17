@@ -132,7 +132,6 @@ export function ChatSidebar({ isOpen, onToggle, activeConversationId, onConversa
   }
 
   const handleRenameClick = (conversation: Conversation, e: React.MouseEvent) => {
-    e.stopPropagation()
     setConversationToRename(conversation)
     setNewTitle(conversation.title)
     setRenameDialogOpen(true)
@@ -280,29 +279,25 @@ export function ChatSidebar({ isOpen, onToggle, activeConversationId, onConversa
 
                             {/* Action Buttons */}
                             <div className="absolute bottom-1 right-1 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <Button
-                                        size="icon"
                                         variant="ghost"
-                                        className="h-6 w-6 hover:bg-accent-foreground/10"
-                                        onClick={(e) => e.stopPropagation()}
-                                      >
-                                        <MoreVertical className="h-3 w-3" />
-                                      </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>More actions</TooltipContent>
-                                  </Tooltip>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" side="top">
-                                  <DropdownMenuItem onClick={(e) => handleRenameClick(conv, e)}>
-                                    <Edit className="mr-2 h-3 w-3" />
-                                    Rename
-                                  </DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    size="icon"
+                                    variant="ghost"
+                                    className="h-6 w-6 hover:bg-accent-foreground/10"
+                                    onClick={(e) => {
+                                      e.stopPropagation()
+                                      setConversationToRename(conv)
+                                      setNewTitle(conv.title)
+                                      setRenameDialogOpen(true)
+                                    }}
+                                  >
+                                    <Edit className="h-3 w-3" />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>Rename conversation</TooltipContent>
+                              </Tooltip>
 
                               <Tooltip>
                                 <TooltipTrigger asChild>

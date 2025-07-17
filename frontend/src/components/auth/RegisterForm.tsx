@@ -19,7 +19,8 @@ interface PasswordStrength {
 
 export function RegisterForm() {
   const [credentials, setCredentials] = useState<RegisterCredentials>({
-    name: '',
+    firstName: '',
+    lastName: '',
     email: '',
     password: ''
   })
@@ -67,10 +68,20 @@ export function RegisterForm() {
   const validateForm = (): boolean => {
     const errors: Partial<RegisterCredentials & { confirmPassword: string }> = {}
 
-    if (!credentials.name.trim()) {
-      errors.name = 'Name is required'
-    } else if (credentials.name.trim().length < 2) {
-      errors.name = 'Name must be at least 2 characters'
+    if (!credentials.firstName.trim()) {
+      errors.firstName = 'First name is required'
+    } else if (credentials.firstName.trim().length < 2) {
+      errors.firstName = 'First name must be at least 2 characters'
+    } else if (!/^[a-zA-Z\s'-]+$/.test(credentials.firstName.trim())) {
+      errors.firstName = 'First name can only contain letters, spaces, hyphens, and apostrophes'
+    }
+
+    if (!credentials.lastName.trim()) {
+      errors.lastName = 'Last name is required'
+    } else if (credentials.lastName.trim().length < 2) {
+      errors.lastName = 'Last name must be at least 2 characters'
+    } else if (!/^[a-zA-Z\s'-]+$/.test(credentials.lastName.trim())) {
+      errors.lastName = 'Last name can only contain letters, spaces, hyphens, and apostrophes'
     }
 
     if (!credentials.email) {
@@ -169,21 +180,40 @@ export function RegisterForm() {
               </Alert>
             )}
 
-            <div className="space-y-2">
-              <Label htmlFor="name">Full Name</Label>
-              <Input
-                id="name"
-                type="text"
-                placeholder="John Doe"
-                value={credentials.name}
-                onChange={(e) => handleInputChange('name', e.target.value)}
-                className={validationErrors.name ? 'border-destructive' : ''}
-                disabled={isLoading}
-                autoComplete="name"
-              />
-              {validationErrors.name && (
-                <p className="text-sm text-destructive">{validationErrors.name}</p>
-              )}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="firstName">First Name</Label>
+                <Input
+                  id="firstName"
+                  type="text"
+                  placeholder="John"
+                  value={credentials.firstName}
+                  onChange={(e) => handleInputChange('firstName', e.target.value)}
+                  className={validationErrors.firstName ? 'border-destructive' : ''}
+                  disabled={isLoading}
+                  autoComplete="given-name"
+                />
+                {validationErrors.firstName && (
+                  <p className="text-sm text-destructive">{validationErrors.firstName}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="lastName">Last Name</Label>
+                <Input
+                  id="lastName"
+                  type="text"
+                  placeholder="Doe"
+                  value={credentials.lastName}
+                  onChange={(e) => handleInputChange('lastName', e.target.value)}
+                  className={validationErrors.lastName ? 'border-destructive' : ''}
+                  disabled={isLoading}
+                  autoComplete="family-name"
+                />
+                {validationErrors.lastName && (
+                  <p className="text-sm text-destructive">{validationErrors.lastName}</p>
+                )}
+              </div>
             </div>
 
             <div className="space-y-2">

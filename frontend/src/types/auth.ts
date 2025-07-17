@@ -1,7 +1,9 @@
 export interface User {
   id: string
   email: string
-  name: string
+  firstName: string
+  lastName: string
+  name: string // Computed full name (firstName + lastName)
   avatar?: string
   roles: string[]
   createdAt: Date
@@ -14,9 +16,10 @@ export interface LoginCredentials {
 }
 
 export interface RegisterCredentials {
+  firstName: string
+  lastName: string
   email: string
   password: string
-  name: string
 }
 
 export interface AuthTokens {
@@ -36,6 +39,8 @@ export interface AuthState {
 export interface JWTPayload {
   sub: string // user id
   email: string
+  firstName: string
+  lastName: string
   name: string
   roles: string[]
   iat: number // issued at

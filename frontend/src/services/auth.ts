@@ -1,4 +1,4 @@
-// frontend/src/services/auth.ts (Fixed)
+// frontend/src/services/auth.ts (Updated for first and last name)
 import type { LoginCredentials, RegisterCredentials, AuthTokens, User } from '@/types/auth'
 import { JWTManager } from '@/lib/jwt'
 
@@ -130,11 +130,23 @@ export class AuthService {
       throw new AuthAPIError('Email and password are required', 400, 'MISSING_CREDENTIALS')
     }
 
-    // Mock user data
+    // For login, we'll derive names from email as fallback since we don't have stored user data
+    const emailName = credentials.email.split('@')[0]
+    const nameParts = emailName.split(/[._-]/).map(part => 
+      part.charAt(0).toUpperCase() + part.slice(1).toLowerCase()
+    )
+    
+    const firstName = nameParts[0] || 'User'
+    const lastName = nameParts[1] || 'Account'
+    const fullName = `${firstName} ${lastName}`
+
+    // Mock user data - use actual email and derived names
     const user: User = {
-      id: 'user_123',
+      id: `user_${Date.now()}`,
       email: credentials.email,
-      name: 'John Doe',
+      firstName,
+      lastName,
+      name: fullName,
       avatar: undefined,
       roles: ['user'],
       createdAt: new Date('2024-01-01'),
@@ -146,6 +158,8 @@ export class AuthService {
     const accessTokenPayload = {
       sub: user.id,
       email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
       name: user.name,
       roles: user.roles,
       iat: now,
@@ -156,6 +170,10 @@ export class AuthService {
 
     const refreshTokenPayload = {
       sub: user.id,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      name: user.name,
       iat: now,
       exp: now + (7 * 24 * 60 * 60), // 7 days
       iss: 'levare-ai',
@@ -177,16 +195,67 @@ export class AuthService {
     await new Promise(resolve => setTimeout(resolve, 1500))
 
     // Simple validation
-    if (!credentials.email || !credentials.password || !credentials.name) {
-      throw new AuthAPIError('Email, password, and name are required', 400, 'MISSING_CREDENTIALS')
+    if (!credentials.email || !credentials.password || !credentials.firstName || !credentials.lastName) {
+      throw new AuthAPIError('Email, password, first name, and last name are required', 400, 'MISSING_CREDENTIALS')
     }
 
     if (credentials.password.length < 8) {
       throw new AuthAPIError('Password must be at least 8 characters', 400, 'WEAK_PASSWORD')
     }
 
-    // Use login mock with the new user data
-    return this.mockLogin({ email: credentials.email, password: credentials.password })
+    // Clean and format names
+    const firstName = credentials.firstName.trim()
+    const lastName = credentials.lastName.trim()
+    const fullName = `${firstName} ${lastName}`
+
+    // Mock user data - use the actual provided names
+    const user: User = {
+      id: `user_${Date.now()}`,
+      email: credentials.email,
+      firstName,
+      lastName,
+      name: fullName,
+      avatar: undefined,
+      roles: ['user'],
+      createdAt: new Date(),
+      lastLoginAt: new Date()
+    }
+
+    // Generate mock JWT tokens
+    const now = Math.floor(Date.now() / 1000)
+    const accessTokenPayload = {
+      sub: user.id,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      name: user.name,
+      roles: user.roles,
+      iat: now,
+      exp: now + (15 * 60), // 15 minutes
+      iss: 'levare-ai',
+      aud: 'levare-ai-frontend'
+    }
+
+    const refreshTokenPayload = {
+      sub: user.id,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      name: user.name,
+      iat: now,
+      exp: now + (7 * 24 * 60 * 60), // 7 days
+      iss: 'levare-ai',
+      aud: 'levare-ai-frontend',
+      type: 'refresh'
+    }
+
+    const tokens: AuthTokens = {
+      accessToken: this.createMockJWT(accessTokenPayload),
+      refreshToken: this.createMockJWT(refreshTokenPayload),
+      expiresAt: (now + (15 * 60)) * 1000
+    }
+
+    return { user, tokens }
   }
 
   private async mockRefreshToken(refreshToken: string): Promise<AuthTokens> {
@@ -199,13 +268,18 @@ export class AuthService {
       throw new AuthAPIError('Invalid refresh token', 401, 'INVALID_TOKEN')
     }
 
-    // Generate new access token
+    // Get user info from the stored token payload
+    const userFromToken = jwtManager.getUserFromToken(refreshToken)
+    
+    // Generate new access token with actual user data
     const now = Math.floor(Date.now() / 1000)
     const newAccessTokenPayload = {
       sub: payload.sub,
-      email: 'user@example.com', // This would come from your database
-      name: 'John Doe',
-      roles: ['user'],
+      email: userFromToken?.email || 'user@example.com',
+      firstName: userFromToken?.firstName || 'User',
+      lastName: userFromToken?.lastName || 'Account',
+      name: userFromToken?.name || 'User Account',
+      roles: userFromToken?.roles || ['user'],
       iat: now,
       exp: now + (15 * 60), // 15 minutes
       iss: 'levare-ai',

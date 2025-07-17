@@ -61,10 +61,17 @@ export class JWTManager {
     const payload = this.decodeToken(token)
     if (!payload) return null
 
+    // Handle both old and new token formats for backward compatibility
+    const firstName = payload.firstName || payload.name?.split(' ')[0] || 'User'
+    const lastName = payload.lastName || payload.name?.split(' ').slice(1).join(' ') || 'Account'
+    const fullName = payload.name || `${firstName} ${lastName}`
+
     return {
       id: payload.sub,
       email: payload.email,
-      name: payload.name,
+      firstName,
+      lastName,
+      name: fullName,
       roles: payload.roles || [],
       createdAt: new Date(), // This would come from your backend
       lastLoginAt: new Date()
